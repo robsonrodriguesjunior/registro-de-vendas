@@ -1,0 +1,38 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (category) {
+      <div>
+        <h2 data-cy="categoryDetailsHeading"><span jhiTranslate="registroDeVendasApp.category.detail.title">Category</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ category.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.category.code">Code</span></dt>
+          <dd>
+            <span>{{ category.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.category.name">Name</span></dt>
+          <dd>
+            <span>{{ category.name }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button type="button" [routerLink]="['/category', category.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

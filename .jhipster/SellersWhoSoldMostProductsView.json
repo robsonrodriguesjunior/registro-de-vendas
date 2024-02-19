@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20240218234004"
+  },
+  "applications": "*",
+  "entityTableName": "sellers_who_sold_most_products_view",
+  "fields": [
+    {
+      "fieldName": "quantity",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "position",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "SellersWhoSoldMostProductsView",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "collaborator",
+      "relationshipName": "seller",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

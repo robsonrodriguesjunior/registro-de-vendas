@@ -1,0 +1,47 @@
+{
+  "annotations": {
+    "changelogDate": "20240218233504"
+  },
+  "applications": "*",
+  "entityTableName": "collaborator",
+  "fields": [
+    {
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "255",
+      "fieldValidateRulesMinlength": "1"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "CollaboratorType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SELLER,MANAGER"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "CollaboratorStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ACTIVE,INACTIVE"
+    }
+  ],
+  "name": "Collaborator",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "person",
+      "otherEntityRelationshipName": "seller",
+      "relationshipName": "person",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "sale",
+      "otherEntityRelationshipName": "seller",
+      "relationshipName": "sales",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}

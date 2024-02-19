@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (collaborator) {
+      <div>
+        <h2 data-cy="collaboratorDetailsHeading"><span jhiTranslate="registroDeVendasApp.collaborator.detail.title">Collaborator</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ collaborator.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.collaborator.code">Code</span></dt>
+          <dd>
+            <span>{{ collaborator.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.collaborator.type">Type</span></dt>
+          <dd>
+            <span jhiTranslate="{{ 'registroDeVendasApp.CollaboratorType.' + collaborator.type }}">{{ collaborator.type }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.collaborator.status">Status</span></dt>
+          <dd>
+            <span jhiTranslate="{{ 'registroDeVendasApp.CollaboratorStatus.' + collaborator.status }}">{{ collaborator.status }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.collaborator.person">Person</span></dt>
+          <dd>
+            @if (collaborator.person) {
+              <div>
+                <a [routerLink]="['/person', collaborator.person.id, 'view']">{{ collaborator.person.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button type="button" [routerLink]="['/collaborator', collaborator.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

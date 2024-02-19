@@ -1,0 +1,9 @@
+{
+  "registroDeVendasApp": {
+    "CollaboratorType": {
+      "null": "",
+      "SELLER": "SELLER",
+      "MANAGER": "MANAGER"
+    }
+  }
+}

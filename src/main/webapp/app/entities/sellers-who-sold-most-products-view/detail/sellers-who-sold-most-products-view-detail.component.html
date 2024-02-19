@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (sellersWhoSoldMostProductsView) {
+      <div>
+        <h2 data-cy="sellersWhoSoldMostProductsViewDetailsHeading">
+          <span jhiTranslate="registroDeVendasApp.sellersWhoSoldMostProductsView.detail.title">Sellers Who Sold Most Products View</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ sellersWhoSoldMostProductsView.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sellersWhoSoldMostProductsView.quantity">Quantity</span></dt>
+          <dd>
+            <span>{{ sellersWhoSoldMostProductsView.quantity }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sellersWhoSoldMostProductsView.position">Position</span></dt>
+          <dd>
+            <span>{{ sellersWhoSoldMostProductsView.position }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sellersWhoSoldMostProductsView.seller">Seller</span></dt>
+          <dd>
+            @if (sellersWhoSoldMostProductsView.seller) {
+              <div>
+                <a [routerLink]="['/collaborator', sellersWhoSoldMostProductsView.seller.id, 'view']">{{
+                  sellersWhoSoldMostProductsView.seller.id
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button
+          type="button"
+          [routerLink]="['/sellers-who-sold-most-products-view', sellersWhoSoldMostProductsView.id, 'edit']"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

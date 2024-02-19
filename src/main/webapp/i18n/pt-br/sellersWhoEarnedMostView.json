@@ -1,0 +1,26 @@
+{
+  "registroDeVendasApp": {
+    "sellersWhoEarnedMostView": {
+      "home": {
+        "title": "Sellers Who Earned Most Views",
+        "refreshListLabel": "Atualizar lista",
+        "createLabel": "Criar novo Sellers Who Earned Most View",
+        "createOrEditLabel": "Criar ou editar Sellers Who Earned Most View",
+        "notFound": "Nenhum Sellers Who Earned Most View encontrado"
+      },
+      "created": "Um novo Sellers Who Earned Most View foi criado com o identificador {{ param }}",
+      "updated": "Um Sellers Who Earned Most View foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Sellers Who Earned Most View foi excluído com o identificador {{ param }}",
+      "delete": {
+        "question": "Tem certeza de que deseja excluir Sellers Who Earned Most View {{ id }}?"
+      },
+      "detail": {
+        "title": "Sellers Who Earned Most View"
+      },
+      "id": "ID",
+      "value": "Value",
+      "position": "Position",
+      "seller": "Seller"
+    }
+  }
+}

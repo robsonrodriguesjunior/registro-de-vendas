@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (sellersWhoEarnedMostView) {
+      <div>
+        <h2 data-cy="sellersWhoEarnedMostViewDetailsHeading">
+          <span jhiTranslate="registroDeVendasApp.sellersWhoEarnedMostView.detail.title">Sellers Who Earned Most View</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ sellersWhoEarnedMostView.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sellersWhoEarnedMostView.value">Value</span></dt>
+          <dd>
+            <span>{{ sellersWhoEarnedMostView.value }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sellersWhoEarnedMostView.position">Position</span></dt>
+          <dd>
+            <span>{{ sellersWhoEarnedMostView.position }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sellersWhoEarnedMostView.seller">Seller</span></dt>
+          <dd>
+            @if (sellersWhoEarnedMostView.seller) {
+              <div>
+                <a [routerLink]="['/collaborator', sellersWhoEarnedMostView.seller.id, 'view']">{{ sellersWhoEarnedMostView.seller.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button type="button" [routerLink]="['/sellers-who-earned-most-view', sellersWhoEarnedMostView.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
