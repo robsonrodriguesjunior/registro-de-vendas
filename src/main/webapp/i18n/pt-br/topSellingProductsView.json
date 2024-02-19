@@ -1,0 +1,26 @@
+{
+  "registroDeVendasApp": {
+    "topSellingProductsView": {
+      "home": {
+        "title": "Top Selling Products Views",
+        "refreshListLabel": "Atualizar lista",
+        "createLabel": "Criar novo Top Selling Products View",
+        "createOrEditLabel": "Criar ou editar Top Selling Products View",
+        "notFound": "Nenhum Top Selling Products View encontrado"
+      },
+      "created": "Um novo Top Selling Products View foi criado com o identificador {{ param }}",
+      "updated": "Um Top Selling Products View foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Top Selling Products View foi excluído com o identificador {{ param }}",
+      "delete": {
+        "question": "Tem certeza de que deseja excluir Top Selling Products View {{ id }}?"
+      },
+      "detail": {
+        "title": "Top Selling Products View"
+      },
+      "id": "ID",
+      "quantity": "Quantity",
+      "position": "Position",
+      "product": "Product"
+    }
+  }
+}

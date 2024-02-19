@@ -1,0 +1,26 @@
+{
+  "registroDeVendasApp": {
+    "sellersWhoSoldMostProductsView": {
+      "home": {
+        "title": "Sellers Who Sold Most Products Views",
+        "refreshListLabel": "Atualizar lista",
+        "createLabel": "Criar novo Sellers Who Sold Most Products View",
+        "createOrEditLabel": "Criar ou editar Sellers Who Sold Most Products View",
+        "notFound": "Nenhum Sellers Who Sold Most Products View encontrado"
+      },
+      "created": "Um novo Sellers Who Sold Most Products View foi criado com o identificador {{ param }}",
+      "updated": "Um Sellers Who Sold Most Products View foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Sellers Who Sold Most Products View foi excluído com o identificador {{ param }}",
+      "delete": {
+        "question": "Tem certeza de que deseja excluir Sellers Who Sold Most Products View {{ id }}?"
+      },
+      "detail": {
+        "title": "Sellers Who Sold Most Products View"
+      },
+      "id": "ID",
+      "quantity": "Quantity",
+      "position": "Position",
+      "seller": "Seller"
+    }
+  }
+}

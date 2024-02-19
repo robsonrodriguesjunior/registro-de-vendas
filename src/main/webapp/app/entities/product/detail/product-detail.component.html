@@ -1,0 +1,55 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (product) {
+      <div>
+        <h2 data-cy="productDetailsHeading"><span jhiTranslate="registroDeVendasApp.product.detail.title">Product</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ product.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.product.code">Code</span></dt>
+          <dd>
+            <span>{{ product.code }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.product.name">Name</span></dt>
+          <dd>
+            <span>{{ product.name }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.product.category">Category</span></dt>
+          <dd>
+            @if (product.category) {
+              <div>
+                <a [routerLink]="['/category', product.category.id, 'view']">{{ product.category.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.product.sales">Sales</span></dt>
+          <dd>
+            @for (sales of product.sales; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/sale', sales.id, 'view']">{{ sales.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button type="button" [routerLink]="['/product', product.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

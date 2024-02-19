@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (sale) {
+      <div>
+        <h2 data-cy="saleDetailsHeading"><span jhiTranslate="registroDeVendasApp.sale.detail.title">Sale</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ sale.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sale.date">Date</span></dt>
+          <dd>
+            <span>{{ sale.date | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sale.client">Client</span></dt>
+          <dd>
+            @if (sale.client) {
+              <div>
+                <a [routerLink]="['/client', sale.client.id, 'view']">{{ sale.client.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.sale.seller">Seller</span></dt>
+          <dd>
+            @if (sale.seller) {
+              <div>
+                <a [routerLink]="['/collaborator', sale.seller.id, 'view']">{{ sale.seller.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button type="button" [routerLink]="['/sale', sale.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

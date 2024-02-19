@@ -1,0 +1,134 @@
+<div>
+  <h2 id="page-heading" data-cy="CollaboratorHeading">
+    <span jhiTranslate="registroDeVendasApp.collaborator.home.title">Collaborators</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="registroDeVendasApp.collaborator.home.refreshListLabel">Atualizar lista</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-collaborator"
+        [routerLink]="['/collaborator/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="registroDeVendasApp.collaborator.home.createLabel">Criar novo Collaborator</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (collaborators?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="registroDeVendasApp.collaborator.home.notFound">Nenhum Collaborator encontrado</span>
+    </div>
+  }
+
+  @if (collaborators && collaborators.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">Código</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="code">
+              <div class="d-flex">
+                <span jhiTranslate="registroDeVendasApp.collaborator.code">Code</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="type">
+              <div class="d-flex">
+                <span jhiTranslate="registroDeVendasApp.collaborator.type">Type</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span jhiTranslate="registroDeVendasApp.collaborator.status">Status</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="person.id">
+              <div class="d-flex">
+                <span jhiTranslate="registroDeVendasApp.collaborator.person">Person</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (collaborator of collaborators; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/collaborator', collaborator.id, 'view']">{{ collaborator.id }}</a>
+              </td>
+              <td>{{ collaborator.code }}</td>
+              <td jhiTranslate="{{ 'registroDeVendasApp.CollaboratorType.' + collaborator.type }}">{{ collaborator.type }}</td>
+              <td jhiTranslate="{{ 'registroDeVendasApp.CollaboratorStatus.' + collaborator.status }}">{{ collaborator.status }}</td>
+              <td>
+                @if (collaborator.person) {
+                  <div>
+                    <a [routerLink]="['/person', collaborator.person.id, 'view']">{{ collaborator.person.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/collaborator', collaborator.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Visualizar</span>
+                  </a>
+
+                  <a [routerLink]="['/collaborator', collaborator.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(collaborator)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Excluir</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (collaborators && collaborators.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [page]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
+</div>

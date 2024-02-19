@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (topSellingProductsView) {
+      <div>
+        <h2 data-cy="topSellingProductsViewDetailsHeading">
+          <span jhiTranslate="registroDeVendasApp.topSellingProductsView.detail.title">Top Selling Products View</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">Código</span></dt>
+          <dd>
+            <span>{{ topSellingProductsView.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.topSellingProductsView.quantity">Quantity</span></dt>
+          <dd>
+            <span>{{ topSellingProductsView.quantity }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.topSellingProductsView.position">Position</span></dt>
+          <dd>
+            <span>{{ topSellingProductsView.position }}</span>
+          </dd>
+          <dt><span jhiTranslate="registroDeVendasApp.topSellingProductsView.product">Product</span></dt>
+          <dd>
+            @if (topSellingProductsView.product) {
+              <div>
+                <a [routerLink]="['/product', topSellingProductsView.product.id, 'view']">{{ topSellingProductsView.product.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Voltar</span>
+        </button>
+
+        <button type="button" [routerLink]="['/top-selling-products-view', topSellingProductsView.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

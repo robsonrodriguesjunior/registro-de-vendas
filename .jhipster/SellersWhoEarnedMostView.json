@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20240218233904"
+  },
+  "applications": "*",
+  "entityTableName": "sellers_who_earned_most_view",
+  "fields": [
+    {
+      "fieldName": "value",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "position",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "SellersWhoEarnedMostView",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "collaborator",
+      "relationshipName": "seller",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

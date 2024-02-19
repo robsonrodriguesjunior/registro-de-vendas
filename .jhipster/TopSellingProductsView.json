@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20240218234104"
+  },
+  "applications": "*",
+  "entityTableName": "top_selling_products_view",
+  "fields": [
+    {
+      "fieldName": "quantity",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "position",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "TopSellingProductsView",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "product",
+      "relationshipName": "product",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

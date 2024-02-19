@@ -1,0 +1,28 @@
+{
+  "registroDeVendasApp": {
+    "product": {
+      "home": {
+        "title": "Products",
+        "refreshListLabel": "Atualizar lista",
+        "createLabel": "Criar novo Product",
+        "createOrEditLabel": "Criar ou editar Product",
+        "notFound": "Nenhum Product encontrado"
+      },
+      "created": "Um novo Product foi criado com o identificador {{ param }}",
+      "updated": "Um Product foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Product foi excluído com o identificador {{ param }}",
+      "delete": {
+        "question": "Tem certeza de que deseja excluir Product {{ id }}?"
+      },
+      "detail": {
+        "title": "Product"
+      },
+      "id": "ID",
+      "code": "Code",
+      "name": "Name",
+      "category": "Category",
+      "sales": "Sales",
+      "topSellingProductsView": "Top Selling Products View"
+    }
+  }
+}
