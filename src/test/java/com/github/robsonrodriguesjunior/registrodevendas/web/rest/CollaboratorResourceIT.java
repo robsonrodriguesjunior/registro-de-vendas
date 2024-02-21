@@ -7,6 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.github.robsonrodriguesjunior.registrodevendas.IntegrationTest;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Person;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Sale;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.SellersWhoEarnedMostView;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.SellersWhoSoldMostProductsView;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.enumeration.CollaboratorStatus;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.enumeration.CollaboratorType;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CollaboratorRepository;
@@ -203,6 +207,297 @@ class CollaboratorResourceIT {
             .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
             .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()));
+    }
+
+    @Test
+    @Transactional
+    void getCollaboratorsByIdFiltering() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        Long id = collaborator.getId();
+
+        defaultCollaboratorShouldBeFound("id.equals=" + id);
+        defaultCollaboratorShouldNotBeFound("id.notEquals=" + id);
+
+        defaultCollaboratorShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultCollaboratorShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultCollaboratorShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultCollaboratorShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByCodeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where code equals to DEFAULT_CODE
+        defaultCollaboratorShouldBeFound("code.equals=" + DEFAULT_CODE);
+
+        // Get all the collaboratorList where code equals to UPDATED_CODE
+        defaultCollaboratorShouldNotBeFound("code.equals=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByCodeIsInShouldWork() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where code in DEFAULT_CODE or UPDATED_CODE
+        defaultCollaboratorShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
+
+        // Get all the collaboratorList where code equals to UPDATED_CODE
+        defaultCollaboratorShouldNotBeFound("code.in=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByCodeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where code is not null
+        defaultCollaboratorShouldBeFound("code.specified=true");
+
+        // Get all the collaboratorList where code is null
+        defaultCollaboratorShouldNotBeFound("code.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByCodeContainsSomething() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where code contains DEFAULT_CODE
+        defaultCollaboratorShouldBeFound("code.contains=" + DEFAULT_CODE);
+
+        // Get all the collaboratorList where code contains UPDATED_CODE
+        defaultCollaboratorShouldNotBeFound("code.contains=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByCodeNotContainsSomething() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where code does not contain DEFAULT_CODE
+        defaultCollaboratorShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
+
+        // Get all the collaboratorList where code does not contain UPDATED_CODE
+        defaultCollaboratorShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where type equals to DEFAULT_TYPE
+        defaultCollaboratorShouldBeFound("type.equals=" + DEFAULT_TYPE);
+
+        // Get all the collaboratorList where type equals to UPDATED_TYPE
+        defaultCollaboratorShouldNotBeFound("type.equals=" + UPDATED_TYPE);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByTypeIsInShouldWork() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where type in DEFAULT_TYPE or UPDATED_TYPE
+        defaultCollaboratorShouldBeFound("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE);
+
+        // Get all the collaboratorList where type equals to UPDATED_TYPE
+        defaultCollaboratorShouldNotBeFound("type.in=" + UPDATED_TYPE);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByTypeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where type is not null
+        defaultCollaboratorShouldBeFound("type.specified=true");
+
+        // Get all the collaboratorList where type is null
+        defaultCollaboratorShouldNotBeFound("type.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByStatusIsEqualToSomething() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where status equals to DEFAULT_STATUS
+        defaultCollaboratorShouldBeFound("status.equals=" + DEFAULT_STATUS);
+
+        // Get all the collaboratorList where status equals to UPDATED_STATUS
+        defaultCollaboratorShouldNotBeFound("status.equals=" + UPDATED_STATUS);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByStatusIsInShouldWork() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where status in DEFAULT_STATUS or UPDATED_STATUS
+        defaultCollaboratorShouldBeFound("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS);
+
+        // Get all the collaboratorList where status equals to UPDATED_STATUS
+        defaultCollaboratorShouldNotBeFound("status.in=" + UPDATED_STATUS);
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByStatusIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        collaboratorRepository.saveAndFlush(collaborator);
+
+        // Get all the collaboratorList where status is not null
+        defaultCollaboratorShouldBeFound("status.specified=true");
+
+        // Get all the collaboratorList where status is null
+        defaultCollaboratorShouldNotBeFound("status.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsByPersonIsEqualToSomething() throws Exception {
+        Person person;
+        if (TestUtil.findAll(em, Person.class).isEmpty()) {
+            collaboratorRepository.saveAndFlush(collaborator);
+            person = PersonResourceIT.createEntity(em);
+        } else {
+            person = TestUtil.findAll(em, Person.class).get(0);
+        }
+        em.persist(person);
+        em.flush();
+        collaborator.setPerson(person);
+        collaboratorRepository.saveAndFlush(collaborator);
+        Long personId = person.getId();
+        // Get all the collaboratorList where person equals to personId
+        defaultCollaboratorShouldBeFound("personId.equals=" + personId);
+
+        // Get all the collaboratorList where person equals to (personId + 1)
+        defaultCollaboratorShouldNotBeFound("personId.equals=" + (personId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsBySalesIsEqualToSomething() throws Exception {
+        Sale sales;
+        if (TestUtil.findAll(em, Sale.class).isEmpty()) {
+            collaboratorRepository.saveAndFlush(collaborator);
+            sales = SaleResourceIT.createEntity(em);
+        } else {
+            sales = TestUtil.findAll(em, Sale.class).get(0);
+        }
+        em.persist(sales);
+        em.flush();
+        collaborator.addSales(sales);
+        collaboratorRepository.saveAndFlush(collaborator);
+        Long salesId = sales.getId();
+        // Get all the collaboratorList where sales equals to salesId
+        defaultCollaboratorShouldBeFound("salesId.equals=" + salesId);
+
+        // Get all the collaboratorList where sales equals to (salesId + 1)
+        defaultCollaboratorShouldNotBeFound("salesId.equals=" + (salesId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsBySellersWhoEarnedMostViewIsEqualToSomething() throws Exception {
+        SellersWhoEarnedMostView sellersWhoEarnedMostView;
+        if (TestUtil.findAll(em, SellersWhoEarnedMostView.class).isEmpty()) {
+            collaboratorRepository.saveAndFlush(collaborator);
+            sellersWhoEarnedMostView = SellersWhoEarnedMostViewResourceIT.createEntity(em);
+        } else {
+            sellersWhoEarnedMostView = TestUtil.findAll(em, SellersWhoEarnedMostView.class).get(0);
+        }
+        em.persist(sellersWhoEarnedMostView);
+        em.flush();
+        collaborator.setSellersWhoEarnedMostView(sellersWhoEarnedMostView);
+        sellersWhoEarnedMostView.setSeller(collaborator);
+        collaboratorRepository.saveAndFlush(collaborator);
+        Long sellersWhoEarnedMostViewId = sellersWhoEarnedMostView.getId();
+        // Get all the collaboratorList where sellersWhoEarnedMostView equals to sellersWhoEarnedMostViewId
+        defaultCollaboratorShouldBeFound("sellersWhoEarnedMostViewId.equals=" + sellersWhoEarnedMostViewId);
+
+        // Get all the collaboratorList where sellersWhoEarnedMostView equals to (sellersWhoEarnedMostViewId + 1)
+        defaultCollaboratorShouldNotBeFound("sellersWhoEarnedMostViewId.equals=" + (sellersWhoEarnedMostViewId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllCollaboratorsBySellersWhoSoldMostProductsViewIsEqualToSomething() throws Exception {
+        SellersWhoSoldMostProductsView sellersWhoSoldMostProductsView;
+        if (TestUtil.findAll(em, SellersWhoSoldMostProductsView.class).isEmpty()) {
+            collaboratorRepository.saveAndFlush(collaborator);
+            sellersWhoSoldMostProductsView = SellersWhoSoldMostProductsViewResourceIT.createEntity(em);
+        } else {
+            sellersWhoSoldMostProductsView = TestUtil.findAll(em, SellersWhoSoldMostProductsView.class).get(0);
+        }
+        em.persist(sellersWhoSoldMostProductsView);
+        em.flush();
+        collaborator.setSellersWhoSoldMostProductsView(sellersWhoSoldMostProductsView);
+        sellersWhoSoldMostProductsView.setSeller(collaborator);
+        collaboratorRepository.saveAndFlush(collaborator);
+        Long sellersWhoSoldMostProductsViewId = sellersWhoSoldMostProductsView.getId();
+        // Get all the collaboratorList where sellersWhoSoldMostProductsView equals to sellersWhoSoldMostProductsViewId
+        defaultCollaboratorShouldBeFound("sellersWhoSoldMostProductsViewId.equals=" + sellersWhoSoldMostProductsViewId);
+
+        // Get all the collaboratorList where sellersWhoSoldMostProductsView equals to (sellersWhoSoldMostProductsViewId + 1)
+        defaultCollaboratorShouldNotBeFound("sellersWhoSoldMostProductsViewId.equals=" + (sellersWhoSoldMostProductsViewId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultCollaboratorShouldBeFound(String filter) throws Exception {
+        restCollaboratorMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(collaborator.getId().intValue())))
+            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())));
+
+        // Check, that the count call also returns 1
+        restCollaboratorMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultCollaboratorShouldNotBeFound(String filter) throws Exception {
+        restCollaboratorMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restCollaboratorMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

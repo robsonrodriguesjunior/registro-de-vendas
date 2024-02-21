@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.TopSellingProductsView;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.TopSellingProductsViewRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.TopSellingProductsViewQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.TopSellingProductsViewService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.TopSellingProductsViewCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -27,7 +29,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/top-selling-products-views")
-@Transactional
 public class TopSellingProductsViewResource {
 
     private final Logger log = LoggerFactory.getLogger(TopSellingProductsViewResource.class);
@@ -37,10 +38,20 @@ public class TopSellingProductsViewResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final TopSellingProductsViewService topSellingProductsViewService;
+
     private final TopSellingProductsViewRepository topSellingProductsViewRepository;
 
-    public TopSellingProductsViewResource(TopSellingProductsViewRepository topSellingProductsViewRepository) {
+    private final TopSellingProductsViewQueryService topSellingProductsViewQueryService;
+
+    public TopSellingProductsViewResource(
+        TopSellingProductsViewService topSellingProductsViewService,
+        TopSellingProductsViewRepository topSellingProductsViewRepository,
+        TopSellingProductsViewQueryService topSellingProductsViewQueryService
+    ) {
+        this.topSellingProductsViewService = topSellingProductsViewService;
         this.topSellingProductsViewRepository = topSellingProductsViewRepository;
+        this.topSellingProductsViewQueryService = topSellingProductsViewQueryService;
     }
 
     /**
@@ -57,7 +68,7 @@ public class TopSellingProductsViewResource {
         if (topSellingProductsView.getId() != null) {
             throw new BadRequestAlertException("A new topSellingProductsView cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        TopSellingProductsView result = topSellingProductsViewRepository.save(topSellingProductsView);
+        TopSellingProductsView result = topSellingProductsViewService.save(topSellingProductsView);
         return ResponseEntity
             .created(new URI("/api/top-selling-products-views/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -91,7 +102,7 @@ public class TopSellingProductsViewResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        TopSellingProductsView result = topSellingProductsViewRepository.save(topSellingProductsView);
+        TopSellingProductsView result = topSellingProductsViewService.update(topSellingProductsView);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, topSellingProductsView.getId().toString()))
@@ -126,19 +137,7 @@ public class TopSellingProductsViewResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<TopSellingProductsView> result = topSellingProductsViewRepository
-            .findById(topSellingProductsView.getId())
-            .map(existingTopSellingProductsView -> {
-                if (topSellingProductsView.getQuantity() != null) {
-                    existingTopSellingProductsView.setQuantity(topSellingProductsView.getQuantity());
-                }
-                if (topSellingProductsView.getPosition() != null) {
-                    existingTopSellingProductsView.setPosition(topSellingProductsView.getPosition());
-                }
-
-                return existingTopSellingProductsView;
-            })
-            .map(topSellingProductsViewRepository::save);
+        Optional<TopSellingProductsView> result = topSellingProductsViewService.partialUpdate(topSellingProductsView);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -150,16 +149,31 @@ public class TopSellingProductsViewResource {
      * {@code GET  /top-selling-products-views} : get all the topSellingProductsViews.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of topSellingProductsViews in body.
      */
     @GetMapping("")
     public ResponseEntity<List<TopSellingProductsView>> getAllTopSellingProductsViews(
+        TopSellingProductsViewCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        log.debug("REST request to get a page of TopSellingProductsViews");
-        Page<TopSellingProductsView> page = topSellingProductsViewRepository.findAll(pageable);
+        log.debug("REST request to get TopSellingProductsViews by criteria: {}", criteria);
+
+        Page<TopSellingProductsView> page = topSellingProductsViewQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /top-selling-products-views/count} : count all the topSellingProductsViews.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countTopSellingProductsViews(TopSellingProductsViewCriteria criteria) {
+        log.debug("REST request to count TopSellingProductsViews by criteria: {}", criteria);
+        return ResponseEntity.ok().body(topSellingProductsViewQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -171,7 +185,7 @@ public class TopSellingProductsViewResource {
     @GetMapping("/{id}")
     public ResponseEntity<TopSellingProductsView> getTopSellingProductsView(@PathVariable("id") Long id) {
         log.debug("REST request to get TopSellingProductsView : {}", id);
-        Optional<TopSellingProductsView> topSellingProductsView = topSellingProductsViewRepository.findById(id);
+        Optional<TopSellingProductsView> topSellingProductsView = topSellingProductsViewService.findOne(id);
         return ResponseUtil.wrapOrNotFound(topSellingProductsView);
     }
 
@@ -184,7 +198,7 @@ public class TopSellingProductsViewResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTopSellingProductsView(@PathVariable("id") Long id) {
         log.debug("REST request to delete TopSellingProductsView : {}", id);
-        topSellingProductsViewRepository.deleteById(id);
+        topSellingProductsViewService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.SellersWhoSoldMostProductsView;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.SellersWhoSoldMostProductsViewRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.SellersWhoSoldMostProductsViewQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.SellersWhoSoldMostProductsViewService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.SellersWhoSoldMostProductsViewCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -27,7 +29,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/sellers-who-sold-most-products-views")
-@Transactional
 public class SellersWhoSoldMostProductsViewResource {
 
     private final Logger log = LoggerFactory.getLogger(SellersWhoSoldMostProductsViewResource.class);
@@ -37,10 +38,20 @@ public class SellersWhoSoldMostProductsViewResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final SellersWhoSoldMostProductsViewService sellersWhoSoldMostProductsViewService;
+
     private final SellersWhoSoldMostProductsViewRepository sellersWhoSoldMostProductsViewRepository;
 
-    public SellersWhoSoldMostProductsViewResource(SellersWhoSoldMostProductsViewRepository sellersWhoSoldMostProductsViewRepository) {
+    private final SellersWhoSoldMostProductsViewQueryService sellersWhoSoldMostProductsViewQueryService;
+
+    public SellersWhoSoldMostProductsViewResource(
+        SellersWhoSoldMostProductsViewService sellersWhoSoldMostProductsViewService,
+        SellersWhoSoldMostProductsViewRepository sellersWhoSoldMostProductsViewRepository,
+        SellersWhoSoldMostProductsViewQueryService sellersWhoSoldMostProductsViewQueryService
+    ) {
+        this.sellersWhoSoldMostProductsViewService = sellersWhoSoldMostProductsViewService;
         this.sellersWhoSoldMostProductsViewRepository = sellersWhoSoldMostProductsViewRepository;
+        this.sellersWhoSoldMostProductsViewQueryService = sellersWhoSoldMostProductsViewQueryService;
     }
 
     /**
@@ -58,7 +69,7 @@ public class SellersWhoSoldMostProductsViewResource {
         if (sellersWhoSoldMostProductsView.getId() != null) {
             throw new BadRequestAlertException("A new sellersWhoSoldMostProductsView cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SellersWhoSoldMostProductsView result = sellersWhoSoldMostProductsViewRepository.save(sellersWhoSoldMostProductsView);
+        SellersWhoSoldMostProductsView result = sellersWhoSoldMostProductsViewService.save(sellersWhoSoldMostProductsView);
         return ResponseEntity
             .created(new URI("/api/sellers-who-sold-most-products-views/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -92,7 +103,7 @@ public class SellersWhoSoldMostProductsViewResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        SellersWhoSoldMostProductsView result = sellersWhoSoldMostProductsViewRepository.save(sellersWhoSoldMostProductsView);
+        SellersWhoSoldMostProductsView result = sellersWhoSoldMostProductsViewService.update(sellersWhoSoldMostProductsView);
         return ResponseEntity
             .ok()
             .headers(
@@ -129,19 +140,9 @@ public class SellersWhoSoldMostProductsViewResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<SellersWhoSoldMostProductsView> result = sellersWhoSoldMostProductsViewRepository
-            .findById(sellersWhoSoldMostProductsView.getId())
-            .map(existingSellersWhoSoldMostProductsView -> {
-                if (sellersWhoSoldMostProductsView.getQuantity() != null) {
-                    existingSellersWhoSoldMostProductsView.setQuantity(sellersWhoSoldMostProductsView.getQuantity());
-                }
-                if (sellersWhoSoldMostProductsView.getPosition() != null) {
-                    existingSellersWhoSoldMostProductsView.setPosition(sellersWhoSoldMostProductsView.getPosition());
-                }
-
-                return existingSellersWhoSoldMostProductsView;
-            })
-            .map(sellersWhoSoldMostProductsViewRepository::save);
+        Optional<SellersWhoSoldMostProductsView> result = sellersWhoSoldMostProductsViewService.partialUpdate(
+            sellersWhoSoldMostProductsView
+        );
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -153,16 +154,31 @@ public class SellersWhoSoldMostProductsViewResource {
      * {@code GET  /sellers-who-sold-most-products-views} : get all the sellersWhoSoldMostProductsViews.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of sellersWhoSoldMostProductsViews in body.
      */
     @GetMapping("")
     public ResponseEntity<List<SellersWhoSoldMostProductsView>> getAllSellersWhoSoldMostProductsViews(
+        SellersWhoSoldMostProductsViewCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        log.debug("REST request to get a page of SellersWhoSoldMostProductsViews");
-        Page<SellersWhoSoldMostProductsView> page = sellersWhoSoldMostProductsViewRepository.findAll(pageable);
+        log.debug("REST request to get SellersWhoSoldMostProductsViews by criteria: {}", criteria);
+
+        Page<SellersWhoSoldMostProductsView> page = sellersWhoSoldMostProductsViewQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /sellers-who-sold-most-products-views/count} : count all the sellersWhoSoldMostProductsViews.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countSellersWhoSoldMostProductsViews(SellersWhoSoldMostProductsViewCriteria criteria) {
+        log.debug("REST request to count SellersWhoSoldMostProductsViews by criteria: {}", criteria);
+        return ResponseEntity.ok().body(sellersWhoSoldMostProductsViewQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -174,7 +190,7 @@ public class SellersWhoSoldMostProductsViewResource {
     @GetMapping("/{id}")
     public ResponseEntity<SellersWhoSoldMostProductsView> getSellersWhoSoldMostProductsView(@PathVariable("id") Long id) {
         log.debug("REST request to get SellersWhoSoldMostProductsView : {}", id);
-        Optional<SellersWhoSoldMostProductsView> sellersWhoSoldMostProductsView = sellersWhoSoldMostProductsViewRepository.findById(id);
+        Optional<SellersWhoSoldMostProductsView> sellersWhoSoldMostProductsView = sellersWhoSoldMostProductsViewService.findOne(id);
         return ResponseUtil.wrapOrNotFound(sellersWhoSoldMostProductsView);
     }
 
@@ -187,7 +203,7 @@ public class SellersWhoSoldMostProductsViewResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSellersWhoSoldMostProductsView(@PathVariable("id") Long id) {
         log.debug("REST request to delete SellersWhoSoldMostProductsView : {}", id);
-        sellersWhoSoldMostProductsViewRepository.deleteById(id);
+        sellersWhoSoldMostProductsViewService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

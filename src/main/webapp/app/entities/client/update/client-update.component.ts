@@ -89,7 +89,7 @@ export class ClientUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.personService
-      .query({ filter: 'client-is-null' })
+      .query({ 'clientId.specified': 'false' })
       .pipe(map((res: HttpResponse<IPerson[]>) => res.body ?? []))
       .pipe(map((people: IPerson[]) => this.personService.addPersonToCollectionIfMissing<IPerson>(people, this.client?.person)))
       .subscribe((people: IPerson[]) => (this.peopleCollection = people));

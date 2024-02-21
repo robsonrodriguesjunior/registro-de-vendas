@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SellersWhoEarnedMostViewRepository extends JpaRepository<SellersWhoEarnedMostView, Long> {}
+public interface SellersWhoEarnedMostViewRepository
+    extends JpaRepository<SellersWhoEarnedMostView, Long>, JpaSpecificationExecutor<SellersWhoEarnedMostView> {}

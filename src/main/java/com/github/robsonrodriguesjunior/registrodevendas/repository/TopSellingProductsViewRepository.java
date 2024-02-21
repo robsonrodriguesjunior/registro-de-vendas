@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface TopSellingProductsViewRepository extends JpaRepository<TopSellingProductsView, Long> {}
+public interface TopSellingProductsViewRepository
+    extends JpaRepository<TopSellingProductsView, Long>, JpaSpecificationExecutor<TopSellingProductsView> {}

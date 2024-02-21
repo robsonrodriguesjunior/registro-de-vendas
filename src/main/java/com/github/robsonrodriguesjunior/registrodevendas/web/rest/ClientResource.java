@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Client;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.ClientRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.ClientQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.ClientService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.ClientCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -29,7 +31,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/clients")
-@Transactional
 public class ClientResource {
 
     private final Logger log = LoggerFactory.getLogger(ClientResource.class);
@@ -39,10 +40,16 @@ public class ClientResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ClientService clientService;
+
     private final ClientRepository clientRepository;
 
-    public ClientResource(ClientRepository clientRepository) {
+    private final ClientQueryService clientQueryService;
+
+    public ClientResource(ClientService clientService, ClientRepository clientRepository, ClientQueryService clientQueryService) {
+        this.clientService = clientService;
         this.clientRepository = clientRepository;
+        this.clientQueryService = clientQueryService;
     }
 
     /**
@@ -58,7 +65,7 @@ public class ClientResource {
         if (client.getId() != null) {
             throw new BadRequestAlertException("A new client cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Client result = clientRepository.save(client);
+        Client result = clientService.save(client);
         return ResponseEntity
             .created(new URI("/api/clients/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -92,7 +99,7 @@ public class ClientResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Client result = clientRepository.save(client);
+        Client result = clientService.update(client);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, client.getId().toString()))
@@ -127,16 +134,7 @@ public class ClientResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Client> result = clientRepository
-            .findById(client.getId())
-            .map(existingClient -> {
-                if (client.getCode() != null) {
-                    existingClient.setCode(client.getCode());
-                }
-
-                return existingClient;
-            })
-            .map(clientRepository::save);
+        Optional<Client> result = clientService.partialUpdate(client);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -148,14 +146,31 @@ public class ClientResource {
      * {@code GET  /clients} : get all the clients.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of clients in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<Client>> getAllClients(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Clients");
-        Page<Client> page = clientRepository.findAll(pageable);
+    public ResponseEntity<List<Client>> getAllClients(
+        ClientCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Clients by criteria: {}", criteria);
+
+        Page<Client> page = clientQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /clients/count} : count all the clients.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countClients(ClientCriteria criteria) {
+        log.debug("REST request to count Clients by criteria: {}", criteria);
+        return ResponseEntity.ok().body(clientQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -167,7 +182,7 @@ public class ClientResource {
     @GetMapping("/{id}")
     public ResponseEntity<Client> getClient(@PathVariable("id") Long id) {
         log.debug("REST request to get Client : {}", id);
-        Optional<Client> client = clientRepository.findById(id);
+        Optional<Client> client = clientService.findOne(id);
         return ResponseUtil.wrapOrNotFound(client);
     }
 
@@ -180,7 +195,7 @@ public class ClientResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable("id") Long id) {
         log.debug("REST request to delete Client : {}", id);
-        clientRepository.deleteById(id);
+        clientService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

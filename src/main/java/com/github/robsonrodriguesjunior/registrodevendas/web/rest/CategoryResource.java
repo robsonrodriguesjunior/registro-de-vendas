@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Category;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CategoryRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.CategoryQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.CategoryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.CategoryCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -29,7 +31,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/categories")
-@Transactional
 public class CategoryResource {
 
     private final Logger log = LoggerFactory.getLogger(CategoryResource.class);
@@ -39,10 +40,20 @@ public class CategoryResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final CategoryService categoryService;
+
     private final CategoryRepository categoryRepository;
 
-    public CategoryResource(CategoryRepository categoryRepository) {
+    private final CategoryQueryService categoryQueryService;
+
+    public CategoryResource(
+        CategoryService categoryService,
+        CategoryRepository categoryRepository,
+        CategoryQueryService categoryQueryService
+    ) {
+        this.categoryService = categoryService;
         this.categoryRepository = categoryRepository;
+        this.categoryQueryService = categoryQueryService;
     }
 
     /**
@@ -58,7 +69,7 @@ public class CategoryResource {
         if (category.getId() != null) {
             throw new BadRequestAlertException("A new category cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Category result = categoryRepository.save(category);
+        Category result = categoryService.save(category);
         return ResponseEntity
             .created(new URI("/api/categories/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -92,7 +103,7 @@ public class CategoryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Category result = categoryRepository.save(category);
+        Category result = categoryService.update(category);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, category.getId().toString()))
@@ -127,19 +138,7 @@ public class CategoryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Category> result = categoryRepository
-            .findById(category.getId())
-            .map(existingCategory -> {
-                if (category.getCode() != null) {
-                    existingCategory.setCode(category.getCode());
-                }
-                if (category.getName() != null) {
-                    existingCategory.setName(category.getName());
-                }
-
-                return existingCategory;
-            })
-            .map(categoryRepository::save);
+        Optional<Category> result = categoryService.partialUpdate(category);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -151,14 +150,31 @@ public class CategoryResource {
      * {@code GET  /categories} : get all the categories.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of categories in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<Category>> getAllCategories(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Categories");
-        Page<Category> page = categoryRepository.findAll(pageable);
+    public ResponseEntity<List<Category>> getAllCategories(
+        CategoryCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get Categories by criteria: {}", criteria);
+
+        Page<Category> page = categoryQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /categories/count} : count all the categories.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countCategories(CategoryCriteria criteria) {
+        log.debug("REST request to count Categories by criteria: {}", criteria);
+        return ResponseEntity.ok().body(categoryQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -170,7 +186,7 @@ public class CategoryResource {
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategory(@PathVariable("id") Long id) {
         log.debug("REST request to get Category : {}", id);
-        Optional<Category> category = categoryRepository.findById(id);
+        Optional<Category> category = categoryService.findOne(id);
         return ResponseUtil.wrapOrNotFound(category);
     }
 
@@ -183,7 +199,7 @@ public class CategoryResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
         log.debug("REST request to delete Category : {}", id);
-        categoryRepository.deleteById(id);
+        categoryService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

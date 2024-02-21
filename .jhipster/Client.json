@@ -13,6 +13,7 @@
       "fieldValidateRulesMinlength": "1"
     }
   ],
+  "jpaMetamodelFiltering": true,
   "name": "Client",
   "pagination": "pagination",
   "relationships": [
@@ -31,5 +32,6 @@
       "relationshipType": "one-to-many"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceClass"
 }

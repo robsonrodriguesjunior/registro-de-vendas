@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CollaboratorRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.CollaboratorQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.CollaboratorService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.CollaboratorCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,16 +13,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -31,7 +31,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/collaborators")
-@Transactional
 public class CollaboratorResource {
 
     private final Logger log = LoggerFactory.getLogger(CollaboratorResource.class);
@@ -41,10 +40,20 @@ public class CollaboratorResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final CollaboratorService collaboratorService;
+
     private final CollaboratorRepository collaboratorRepository;
 
-    public CollaboratorResource(CollaboratorRepository collaboratorRepository) {
+    private final CollaboratorQueryService collaboratorQueryService;
+
+    public CollaboratorResource(
+        CollaboratorService collaboratorService,
+        CollaboratorRepository collaboratorRepository,
+        CollaboratorQueryService collaboratorQueryService
+    ) {
+        this.collaboratorService = collaboratorService;
         this.collaboratorRepository = collaboratorRepository;
+        this.collaboratorQueryService = collaboratorQueryService;
     }
 
     /**
@@ -60,7 +69,7 @@ public class CollaboratorResource {
         if (collaborator.getId() != null) {
             throw new BadRequestAlertException("A new collaborator cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Collaborator result = collaboratorRepository.save(collaborator);
+        Collaborator result = collaboratorService.save(collaborator);
         return ResponseEntity
             .created(new URI("/api/collaborators/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -94,7 +103,7 @@ public class CollaboratorResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Collaborator result = collaboratorRepository.save(collaborator);
+        Collaborator result = collaboratorService.update(collaborator);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, collaborator.getId().toString()))
@@ -129,22 +138,7 @@ public class CollaboratorResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Collaborator> result = collaboratorRepository
-            .findById(collaborator.getId())
-            .map(existingCollaborator -> {
-                if (collaborator.getCode() != null) {
-                    existingCollaborator.setCode(collaborator.getCode());
-                }
-                if (collaborator.getType() != null) {
-                    existingCollaborator.setType(collaborator.getType());
-                }
-                if (collaborator.getStatus() != null) {
-                    existingCollaborator.setStatus(collaborator.getStatus());
-                }
-
-                return existingCollaborator;
-            })
-            .map(collaboratorRepository::save);
+        Optional<Collaborator> result = collaboratorService.partialUpdate(collaborator);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -156,39 +150,31 @@ public class CollaboratorResource {
      * {@code GET  /collaborators} : get all the collaborators.
      *
      * @param pageable the pagination information.
-     * @param filter the filter of the request.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of collaborators in body.
      */
     @GetMapping("")
     public ResponseEntity<List<Collaborator>> getAllCollaborators(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "filter", required = false) String filter
+        CollaboratorCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        if ("sellerswhoearnedmostview-is-null".equals(filter)) {
-            log.debug("REST request to get all Collaborators where sellersWhoEarnedMostView is null");
-            return new ResponseEntity<>(
-                StreamSupport
-                    .stream(collaboratorRepository.findAll().spliterator(), false)
-                    .filter(collaborator -> collaborator.getSellersWhoEarnedMostView() == null)
-                    .toList(),
-                HttpStatus.OK
-            );
-        }
+        log.debug("REST request to get Collaborators by criteria: {}", criteria);
 
-        if ("sellerswhosoldmostproductsview-is-null".equals(filter)) {
-            log.debug("REST request to get all Collaborators where sellersWhoSoldMostProductsView is null");
-            return new ResponseEntity<>(
-                StreamSupport
-                    .stream(collaboratorRepository.findAll().spliterator(), false)
-                    .filter(collaborator -> collaborator.getSellersWhoSoldMostProductsView() == null)
-                    .toList(),
-                HttpStatus.OK
-            );
-        }
-        log.debug("REST request to get a page of Collaborators");
-        Page<Collaborator> page = collaboratorRepository.findAll(pageable);
+        Page<Collaborator> page = collaboratorQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /collaborators/count} : count all the collaborators.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countCollaborators(CollaboratorCriteria criteria) {
+        log.debug("REST request to count Collaborators by criteria: {}", criteria);
+        return ResponseEntity.ok().body(collaboratorQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -200,7 +186,7 @@ public class CollaboratorResource {
     @GetMapping("/{id}")
     public ResponseEntity<Collaborator> getCollaborator(@PathVariable("id") Long id) {
         log.debug("REST request to get Collaborator : {}", id);
-        Optional<Collaborator> collaborator = collaboratorRepository.findById(id);
+        Optional<Collaborator> collaborator = collaboratorService.findOne(id);
         return ResponseUtil.wrapOrNotFound(collaborator);
     }
 
@@ -213,7 +199,7 @@ public class CollaboratorResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCollaborator(@PathVariable("id") Long id) {
         log.debug("REST request to delete Collaborator : {}", id);
-        collaboratorRepository.deleteById(id);
+        collaboratorService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

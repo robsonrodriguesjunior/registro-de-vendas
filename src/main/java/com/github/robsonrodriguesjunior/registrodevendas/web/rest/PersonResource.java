@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Person;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.PersonRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.PersonQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.PersonService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.PersonCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,16 +13,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -31,7 +31,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/people")
-@Transactional
 public class PersonResource {
 
     private final Logger log = LoggerFactory.getLogger(PersonResource.class);
@@ -41,10 +40,16 @@ public class PersonResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final PersonService personService;
+
     private final PersonRepository personRepository;
 
-    public PersonResource(PersonRepository personRepository) {
+    private final PersonQueryService personQueryService;
+
+    public PersonResource(PersonService personService, PersonRepository personRepository, PersonQueryService personQueryService) {
+        this.personService = personService;
         this.personRepository = personRepository;
+        this.personQueryService = personQueryService;
     }
 
     /**
@@ -60,7 +65,7 @@ public class PersonResource {
         if (person.getId() != null) {
             throw new BadRequestAlertException("A new person cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Person result = personRepository.save(person);
+        Person result = personService.save(person);
         return ResponseEntity
             .created(new URI("/api/people/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -94,7 +99,7 @@ public class PersonResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Person result = personRepository.save(person);
+        Person result = personService.update(person);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, person.getId().toString()))
@@ -129,22 +134,7 @@ public class PersonResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Person> result = personRepository
-            .findById(person.getId())
-            .map(existingPerson -> {
-                if (person.getFirstName() != null) {
-                    existingPerson.setFirstName(person.getFirstName());
-                }
-                if (person.getSecondName() != null) {
-                    existingPerson.setSecondName(person.getSecondName());
-                }
-                if (person.getBirthday() != null) {
-                    existingPerson.setBirthday(person.getBirthday());
-                }
-
-                return existingPerson;
-            })
-            .map(personRepository::save);
+        Optional<Person> result = personService.partialUpdate(person);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -156,33 +146,31 @@ public class PersonResource {
      * {@code GET  /people} : get all the people.
      *
      * @param pageable the pagination information.
-     * @param filter the filter of the request.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of people in body.
      */
     @GetMapping("")
     public ResponseEntity<List<Person>> getAllPeople(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "filter", required = false) String filter
+        PersonCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        if ("client-is-null".equals(filter)) {
-            log.debug("REST request to get all Persons where client is null");
-            return new ResponseEntity<>(
-                StreamSupport.stream(personRepository.findAll().spliterator(), false).filter(person -> person.getClient() == null).toList(),
-                HttpStatus.OK
-            );
-        }
+        log.debug("REST request to get People by criteria: {}", criteria);
 
-        if ("seller-is-null".equals(filter)) {
-            log.debug("REST request to get all Persons where seller is null");
-            return new ResponseEntity<>(
-                StreamSupport.stream(personRepository.findAll().spliterator(), false).filter(person -> person.getSeller() == null).toList(),
-                HttpStatus.OK
-            );
-        }
-        log.debug("REST request to get a page of People");
-        Page<Person> page = personRepository.findAll(pageable);
+        Page<Person> page = personQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /people/count} : count all the people.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countPeople(PersonCriteria criteria) {
+        log.debug("REST request to count People by criteria: {}", criteria);
+        return ResponseEntity.ok().body(personQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -194,7 +182,7 @@ public class PersonResource {
     @GetMapping("/{id}")
     public ResponseEntity<Person> getPerson(@PathVariable("id") Long id) {
         log.debug("REST request to get Person : {}", id);
-        Optional<Person> person = personRepository.findById(id);
+        Optional<Person> person = personService.findOne(id);
         return ResponseUtil.wrapOrNotFound(person);
     }
 
@@ -207,7 +195,7 @@ public class PersonResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable("id") Long id) {
         log.debug("REST request to delete Person : {}", id);
-        personRepository.deleteById(id);
+        personService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository;
  * For more information refer to https://github.com/jhipster/generator-jhipster/issues/17990.
  */
 @Repository
-public interface ProductRepository extends ProductRepositoryWithBagRelationships, JpaRepository<Product, Long> {
+public interface ProductRepository
+    extends ProductRepositoryWithBagRelationships, JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     default Optional<Product> findOneWithEagerRelationships(Long id) {
         return this.fetchBagRelationships(this.findById(id));
     }

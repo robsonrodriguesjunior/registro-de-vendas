@@ -24,6 +24,8 @@
 
   <jhi-alert></jhi-alert>
 
+  <jhi-filter [filters]="filters"></jhi-filter>
+
   @if (clients?.length === 0) {
     <div class="alert alert-warning" id="no-result">
       <span jhiTranslate="registroDeVendasApp.client.home.notFound">Nenhum Client encontrado</span>
@@ -74,6 +76,21 @@
               </td>
               <td class="text-end">
                 <div class="btn-group">
+                  <button
+                    type="submit"
+                    [routerLink]="['/sale']"
+                    [queryParams]="{ 'filter[clientId.in]': client.id }"
+                    class="btn btn-info btn-sm"
+                    data-cy="filterOtherEntityButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span
+                      class="d-none d-md-inline"
+                      jhiTranslate="entity.action.show"
+                      [translateValues]="{ otherEntity: ('registroDeVendasApp.client.buys' | translate) }"
+                      >Mostrar Sale</span
+                    >
+                  </button>
                   <a [routerLink]="['/client', client.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="eye"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Visualizar</span>

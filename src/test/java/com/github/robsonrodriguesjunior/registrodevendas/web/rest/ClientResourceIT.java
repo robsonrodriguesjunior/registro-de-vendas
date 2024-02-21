@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.github.robsonrodriguesjunior.registrodevendas.IntegrationTest;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Client;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Person;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Sale;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.ClientRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -155,6 +157,171 @@ class ClientResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(client.getId().intValue()))
             .andExpect(jsonPath("$.code").value(DEFAULT_CODE));
+    }
+
+    @Test
+    @Transactional
+    void getClientsByIdFiltering() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        Long id = client.getId();
+
+        defaultClientShouldBeFound("id.equals=" + id);
+        defaultClientShouldNotBeFound("id.notEquals=" + id);
+
+        defaultClientShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultClientShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultClientShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultClientShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByCodeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where code equals to DEFAULT_CODE
+        defaultClientShouldBeFound("code.equals=" + DEFAULT_CODE);
+
+        // Get all the clientList where code equals to UPDATED_CODE
+        defaultClientShouldNotBeFound("code.equals=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByCodeIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where code in DEFAULT_CODE or UPDATED_CODE
+        defaultClientShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
+
+        // Get all the clientList where code equals to UPDATED_CODE
+        defaultClientShouldNotBeFound("code.in=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByCodeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where code is not null
+        defaultClientShouldBeFound("code.specified=true");
+
+        // Get all the clientList where code is null
+        defaultClientShouldNotBeFound("code.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByCodeContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where code contains DEFAULT_CODE
+        defaultClientShouldBeFound("code.contains=" + DEFAULT_CODE);
+
+        // Get all the clientList where code contains UPDATED_CODE
+        defaultClientShouldNotBeFound("code.contains=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByCodeNotContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where code does not contain DEFAULT_CODE
+        defaultClientShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
+
+        // Get all the clientList where code does not contain UPDATED_CODE
+        defaultClientShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPersonIsEqualToSomething() throws Exception {
+        Person person;
+        if (TestUtil.findAll(em, Person.class).isEmpty()) {
+            clientRepository.saveAndFlush(client);
+            person = PersonResourceIT.createEntity(em);
+        } else {
+            person = TestUtil.findAll(em, Person.class).get(0);
+        }
+        em.persist(person);
+        em.flush();
+        client.setPerson(person);
+        clientRepository.saveAndFlush(client);
+        Long personId = person.getId();
+        // Get all the clientList where person equals to personId
+        defaultClientShouldBeFound("personId.equals=" + personId);
+
+        // Get all the clientList where person equals to (personId + 1)
+        defaultClientShouldNotBeFound("personId.equals=" + (personId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByBuysIsEqualToSomething() throws Exception {
+        Sale buys;
+        if (TestUtil.findAll(em, Sale.class).isEmpty()) {
+            clientRepository.saveAndFlush(client);
+            buys = SaleResourceIT.createEntity(em);
+        } else {
+            buys = TestUtil.findAll(em, Sale.class).get(0);
+        }
+        em.persist(buys);
+        em.flush();
+        client.addBuys(buys);
+        clientRepository.saveAndFlush(client);
+        Long buysId = buys.getId();
+        // Get all the clientList where buys equals to buysId
+        defaultClientShouldBeFound("buysId.equals=" + buysId);
+
+        // Get all the clientList where buys equals to (buysId + 1)
+        defaultClientShouldNotBeFound("buysId.equals=" + (buysId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultClientShouldBeFound(String filter) throws Exception {
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(client.getId().intValue())))
+            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)));
+
+        // Check, that the count call also returns 1
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultClientShouldNotBeFound(String filter) throws Exception {
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

@@ -11,6 +11,7 @@
       "fieldValidateRules": ["required"]
     }
   ],
+  "jpaMetamodelFiltering": true,
   "name": "Sale",
   "pagination": "pagination",
   "relationships": [
@@ -38,5 +39,6 @@
       "relationshipType": "many-to-many"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceClass"
 }

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.github.robsonrodriguesjunior.registrodevendas.IntegrationTest;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.SellersWhoSoldMostProductsView;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.SellersWhoSoldMostProductsViewRepository;
 import jakarta.persistence.EntityManager;
@@ -31,9 +32,11 @@ class SellersWhoSoldMostProductsViewResourceIT {
 
     private static final Long DEFAULT_QUANTITY = 1L;
     private static final Long UPDATED_QUANTITY = 2L;
+    private static final Long SMALLER_QUANTITY = 1L - 1L;
 
     private static final Long DEFAULT_POSITION = 1L;
     private static final Long UPDATED_POSITION = 2L;
+    private static final Long SMALLER_POSITION = 1L - 1L;
 
     private static final String ENTITY_API_URL = "/api/sellers-who-sold-most-products-views";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -158,6 +161,267 @@ class SellersWhoSoldMostProductsViewResourceIT {
             .andExpect(jsonPath("$.id").value(sellersWhoSoldMostProductsView.getId().intValue()))
             .andExpect(jsonPath("$.quantity").value(DEFAULT_QUANTITY.intValue()))
             .andExpect(jsonPath("$.position").value(DEFAULT_POSITION.intValue()));
+    }
+
+    @Test
+    @Transactional
+    void getSellersWhoSoldMostProductsViewsByIdFiltering() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        Long id = sellersWhoSoldMostProductsView.getId();
+
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("id.equals=" + id);
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("id.notEquals=" + id);
+
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsEqualToSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity equals to DEFAULT_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.equals=" + DEFAULT_QUANTITY);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity equals to UPDATED_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.equals=" + UPDATED_QUANTITY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsInShouldWork() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity in DEFAULT_QUANTITY or UPDATED_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.in=" + DEFAULT_QUANTITY + "," + UPDATED_QUANTITY);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity equals to UPDATED_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.in=" + UPDATED_QUANTITY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is not null
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.specified=true");
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is null
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is greater than or equal to DEFAULT_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.greaterThanOrEqual=" + DEFAULT_QUANTITY);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is greater than or equal to UPDATED_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.greaterThanOrEqual=" + UPDATED_QUANTITY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is less than or equal to DEFAULT_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.lessThanOrEqual=" + DEFAULT_QUANTITY);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is less than or equal to SMALLER_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.lessThanOrEqual=" + SMALLER_QUANTITY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsLessThanSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is less than DEFAULT_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.lessThan=" + DEFAULT_QUANTITY);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is less than UPDATED_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.lessThan=" + UPDATED_QUANTITY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByQuantityIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is greater than DEFAULT_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("quantity.greaterThan=" + DEFAULT_QUANTITY);
+
+        // Get all the sellersWhoSoldMostProductsViewList where quantity is greater than SMALLER_QUANTITY
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("quantity.greaterThan=" + SMALLER_QUANTITY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position equals to DEFAULT_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.equals=" + DEFAULT_POSITION);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position equals to UPDATED_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.equals=" + UPDATED_POSITION);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsInShouldWork() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position in DEFAULT_POSITION or UPDATED_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.in=" + DEFAULT_POSITION + "," + UPDATED_POSITION);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position equals to UPDATED_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.in=" + UPDATED_POSITION);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is not null
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.specified=true");
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is null
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is greater than or equal to DEFAULT_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.greaterThanOrEqual=" + DEFAULT_POSITION);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is greater than or equal to UPDATED_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.greaterThanOrEqual=" + UPDATED_POSITION);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is less than or equal to DEFAULT_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.lessThanOrEqual=" + DEFAULT_POSITION);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is less than or equal to SMALLER_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.lessThanOrEqual=" + SMALLER_POSITION);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsLessThanSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is less than DEFAULT_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.lessThan=" + DEFAULT_POSITION);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is less than UPDATED_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.lessThan=" + UPDATED_POSITION);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsByPositionIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is greater than DEFAULT_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("position.greaterThan=" + DEFAULT_POSITION);
+
+        // Get all the sellersWhoSoldMostProductsViewList where position is greater than SMALLER_POSITION
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("position.greaterThan=" + SMALLER_POSITION);
+    }
+
+    @Test
+    @Transactional
+    void getAllSellersWhoSoldMostProductsViewsBySellerIsEqualToSomething() throws Exception {
+        Collaborator seller;
+        if (TestUtil.findAll(em, Collaborator.class).isEmpty()) {
+            sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+            seller = CollaboratorResourceIT.createEntity(em);
+        } else {
+            seller = TestUtil.findAll(em, Collaborator.class).get(0);
+        }
+        em.persist(seller);
+        em.flush();
+        sellersWhoSoldMostProductsView.setSeller(seller);
+        sellersWhoSoldMostProductsViewRepository.saveAndFlush(sellersWhoSoldMostProductsView);
+        Long sellerId = seller.getId();
+        // Get all the sellersWhoSoldMostProductsViewList where seller equals to sellerId
+        defaultSellersWhoSoldMostProductsViewShouldBeFound("sellerId.equals=" + sellerId);
+
+        // Get all the sellersWhoSoldMostProductsViewList where seller equals to (sellerId + 1)
+        defaultSellersWhoSoldMostProductsViewShouldNotBeFound("sellerId.equals=" + (sellerId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultSellersWhoSoldMostProductsViewShouldBeFound(String filter) throws Exception {
+        restSellersWhoSoldMostProductsViewMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(sellersWhoSoldMostProductsView.getId().intValue())))
+            .andExpect(jsonPath("$.[*].quantity").value(hasItem(DEFAULT_QUANTITY.intValue())))
+            .andExpect(jsonPath("$.[*].position").value(hasItem(DEFAULT_POSITION.intValue())));
+
+        // Check, that the count call also returns 1
+        restSellersWhoSoldMostProductsViewMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultSellersWhoSoldMostProductsViewShouldNotBeFound(String filter) throws Exception {
+        restSellersWhoSoldMostProductsViewMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restSellersWhoSoldMostProductsViewMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

@@ -25,6 +25,7 @@
       "fieldValues": "ACTIVE,INACTIVE"
     }
   ],
+  "jpaMetamodelFiltering": true,
   "name": "Collaborator",
   "pagination": "pagination",
   "relationships": [
@@ -43,5 +44,6 @@
       "relationshipType": "one-to-many"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceClass"
 }
