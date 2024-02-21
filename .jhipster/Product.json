@@ -20,6 +20,7 @@
       "fieldValidateRulesMinlength": "1"
     }
   ],
+  "jpaMetamodelFiltering": true,
   "name": "Product",
   "pagination": "pagination",
   "relationships": [
@@ -39,5 +40,6 @@
       "relationshipType": "many-to-many"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceClass"
 }

@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.robsonrodriguesjunior.registrodevendas.IntegrationTest;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Client;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Product;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Sale;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.SaleRepository;
 import jakarta.persistence.EntityManager;
@@ -199,6 +200,167 @@ class SaleResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(sale.getId().intValue()))
             .andExpect(jsonPath("$.date").value(DEFAULT_DATE.toString()));
+    }
+
+    @Test
+    @Transactional
+    void getSalesByIdFiltering() throws Exception {
+        // Initialize the database
+        saleRepository.saveAndFlush(sale);
+
+        Long id = sale.getId();
+
+        defaultSaleShouldBeFound("id.equals=" + id);
+        defaultSaleShouldNotBeFound("id.notEquals=" + id);
+
+        defaultSaleShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultSaleShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultSaleShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultSaleShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllSalesByDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        saleRepository.saveAndFlush(sale);
+
+        // Get all the saleList where date equals to DEFAULT_DATE
+        defaultSaleShouldBeFound("date.equals=" + DEFAULT_DATE);
+
+        // Get all the saleList where date equals to UPDATED_DATE
+        defaultSaleShouldNotBeFound("date.equals=" + UPDATED_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSalesByDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        saleRepository.saveAndFlush(sale);
+
+        // Get all the saleList where date in DEFAULT_DATE or UPDATED_DATE
+        defaultSaleShouldBeFound("date.in=" + DEFAULT_DATE + "," + UPDATED_DATE);
+
+        // Get all the saleList where date equals to UPDATED_DATE
+        defaultSaleShouldNotBeFound("date.in=" + UPDATED_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllSalesByDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        saleRepository.saveAndFlush(sale);
+
+        // Get all the saleList where date is not null
+        defaultSaleShouldBeFound("date.specified=true");
+
+        // Get all the saleList where date is null
+        defaultSaleShouldNotBeFound("date.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSalesByClientIsEqualToSomething() throws Exception {
+        Client client;
+        if (TestUtil.findAll(em, Client.class).isEmpty()) {
+            saleRepository.saveAndFlush(sale);
+            client = ClientResourceIT.createEntity(em);
+        } else {
+            client = TestUtil.findAll(em, Client.class).get(0);
+        }
+        em.persist(client);
+        em.flush();
+        sale.setClient(client);
+        saleRepository.saveAndFlush(sale);
+        Long clientId = client.getId();
+        // Get all the saleList where client equals to clientId
+        defaultSaleShouldBeFound("clientId.equals=" + clientId);
+
+        // Get all the saleList where client equals to (clientId + 1)
+        defaultSaleShouldNotBeFound("clientId.equals=" + (clientId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllSalesBySellerIsEqualToSomething() throws Exception {
+        Collaborator seller;
+        if (TestUtil.findAll(em, Collaborator.class).isEmpty()) {
+            saleRepository.saveAndFlush(sale);
+            seller = CollaboratorResourceIT.createEntity(em);
+        } else {
+            seller = TestUtil.findAll(em, Collaborator.class).get(0);
+        }
+        em.persist(seller);
+        em.flush();
+        sale.setSeller(seller);
+        saleRepository.saveAndFlush(sale);
+        Long sellerId = seller.getId();
+        // Get all the saleList where seller equals to sellerId
+        defaultSaleShouldBeFound("sellerId.equals=" + sellerId);
+
+        // Get all the saleList where seller equals to (sellerId + 1)
+        defaultSaleShouldNotBeFound("sellerId.equals=" + (sellerId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllSalesByProductsIsEqualToSomething() throws Exception {
+        Product products;
+        if (TestUtil.findAll(em, Product.class).isEmpty()) {
+            saleRepository.saveAndFlush(sale);
+            products = ProductResourceIT.createEntity(em);
+        } else {
+            products = TestUtil.findAll(em, Product.class).get(0);
+        }
+        em.persist(products);
+        em.flush();
+        sale.addProducts(products);
+        saleRepository.saveAndFlush(sale);
+        Long productsId = products.getId();
+        // Get all the saleList where products equals to productsId
+        defaultSaleShouldBeFound("productsId.equals=" + productsId);
+
+        // Get all the saleList where products equals to (productsId + 1)
+        defaultSaleShouldNotBeFound("productsId.equals=" + (productsId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultSaleShouldBeFound(String filter) throws Exception {
+        restSaleMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(sale.getId().intValue())))
+            .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString())));
+
+        // Check, that the count call also returns 1
+        restSaleMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultSaleShouldNotBeFound(String filter) throws Exception {
+        restSaleMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restSaleMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

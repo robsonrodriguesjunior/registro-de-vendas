@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Product;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.ProductRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.ProductQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.ProductService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.ProductCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,16 +13,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -31,7 +31,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/products")
-@Transactional
 public class ProductResource {
 
     private final Logger log = LoggerFactory.getLogger(ProductResource.class);
@@ -41,10 +40,16 @@ public class ProductResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ProductService productService;
+
     private final ProductRepository productRepository;
 
-    public ProductResource(ProductRepository productRepository) {
+    private final ProductQueryService productQueryService;
+
+    public ProductResource(ProductService productService, ProductRepository productRepository, ProductQueryService productQueryService) {
+        this.productService = productService;
         this.productRepository = productRepository;
+        this.productQueryService = productQueryService;
     }
 
     /**
@@ -60,7 +65,7 @@ public class ProductResource {
         if (product.getId() != null) {
             throw new BadRequestAlertException("A new product cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Product result = productRepository.save(product);
+        Product result = productService.save(product);
         return ResponseEntity
             .created(new URI("/api/products/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -94,7 +99,7 @@ public class ProductResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Product result = productRepository.save(product);
+        Product result = productService.update(product);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, product.getId().toString()))
@@ -129,19 +134,7 @@ public class ProductResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Product> result = productRepository
-            .findById(product.getId())
-            .map(existingProduct -> {
-                if (product.getCode() != null) {
-                    existingProduct.setCode(product.getCode());
-                }
-                if (product.getName() != null) {
-                    existingProduct.setName(product.getName());
-                }
-
-                return existingProduct;
-            })
-            .map(productRepository::save);
+        Optional<Product> result = productService.partialUpdate(product);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -153,35 +146,31 @@ public class ProductResource {
      * {@code GET  /products} : get all the products.
      *
      * @param pageable the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
-     * @param filter the filter of the request.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of products in body.
      */
     @GetMapping("")
     public ResponseEntity<List<Product>> getAllProducts(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "filter", required = false) String filter,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+        ProductCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        if ("topsellingproductsview-is-null".equals(filter)) {
-            log.debug("REST request to get all Products where topSellingProductsView is null");
-            return new ResponseEntity<>(
-                StreamSupport
-                    .stream(productRepository.findAll().spliterator(), false)
-                    .filter(product -> product.getTopSellingProductsView() == null)
-                    .toList(),
-                HttpStatus.OK
-            );
-        }
-        log.debug("REST request to get a page of Products");
-        Page<Product> page;
-        if (eagerload) {
-            page = productRepository.findAllWithEagerRelationships(pageable);
-        } else {
-            page = productRepository.findAll(pageable);
-        }
+        log.debug("REST request to get Products by criteria: {}", criteria);
+
+        Page<Product> page = productQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /products/count} : count all the products.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countProducts(ProductCriteria criteria) {
+        log.debug("REST request to count Products by criteria: {}", criteria);
+        return ResponseEntity.ok().body(productQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -193,7 +182,7 @@ public class ProductResource {
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable("id") Long id) {
         log.debug("REST request to get Product : {}", id);
-        Optional<Product> product = productRepository.findOneWithEagerRelationships(id);
+        Optional<Product> product = productService.findOne(id);
         return ResponseUtil.wrapOrNotFound(product);
     }
 
@@ -206,7 +195,7 @@ public class ProductResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
         log.debug("REST request to delete Product : {}", id);
-        productRepository.deleteById(id);
+        productService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

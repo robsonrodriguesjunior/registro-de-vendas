@@ -93,7 +93,7 @@ export class SellersWhoEarnedMostViewUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.collaboratorService
-      .query({ filter: 'sellerswhoearnedmostview-is-null' })
+      .query({ 'sellersWhoEarnedMostViewId.specified': 'false' })
       .pipe(map((res: HttpResponse<ICollaborator[]>) => res.body ?? []))
       .pipe(
         map((collaborators: ICollaborator[]) =>

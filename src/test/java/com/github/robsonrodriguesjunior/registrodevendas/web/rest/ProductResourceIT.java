@@ -9,7 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.robsonrodriguesjunior.registrodevendas.IntegrationTest;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Category;
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Product;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Sale;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.TopSellingProductsView;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.ProductRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.ProductService;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,9 @@ class ProductResourceIT {
 
     @Mock
     private ProductRepository productRepositoryMock;
+
+    @Mock
+    private ProductService productServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -198,16 +204,16 @@ class ProductResourceIT {
 
     @SuppressWarnings({ "unchecked" })
     void getAllProductsWithEagerRelationshipsIsEnabled() throws Exception {
-        when(productRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+        when(productServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
         restProductMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
-        verify(productRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+        verify(productServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @SuppressWarnings({ "unchecked" })
     void getAllProductsWithEagerRelationshipsIsNotEnabled() throws Exception {
-        when(productRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+        when(productServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
         restProductMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
         verify(productRepositoryMock, times(1)).findAll(any(Pageable.class));
@@ -227,6 +233,260 @@ class ProductResourceIT {
             .andExpect(jsonPath("$.id").value(product.getId().intValue()))
             .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
+    }
+
+    @Test
+    @Transactional
+    void getProductsByIdFiltering() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        Long id = product.getId();
+
+        defaultProductShouldBeFound("id.equals=" + id);
+        defaultProductShouldNotBeFound("id.notEquals=" + id);
+
+        defaultProductShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultProductShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultProductShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultProductShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByCodeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where code equals to DEFAULT_CODE
+        defaultProductShouldBeFound("code.equals=" + DEFAULT_CODE);
+
+        // Get all the productList where code equals to UPDATED_CODE
+        defaultProductShouldNotBeFound("code.equals=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByCodeIsInShouldWork() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where code in DEFAULT_CODE or UPDATED_CODE
+        defaultProductShouldBeFound("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE);
+
+        // Get all the productList where code equals to UPDATED_CODE
+        defaultProductShouldNotBeFound("code.in=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByCodeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where code is not null
+        defaultProductShouldBeFound("code.specified=true");
+
+        // Get all the productList where code is null
+        defaultProductShouldNotBeFound("code.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByCodeContainsSomething() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where code contains DEFAULT_CODE
+        defaultProductShouldBeFound("code.contains=" + DEFAULT_CODE);
+
+        // Get all the productList where code contains UPDATED_CODE
+        defaultProductShouldNotBeFound("code.contains=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByCodeNotContainsSomething() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where code does not contain DEFAULT_CODE
+        defaultProductShouldNotBeFound("code.doesNotContain=" + DEFAULT_CODE);
+
+        // Get all the productList where code does not contain UPDATED_CODE
+        defaultProductShouldBeFound("code.doesNotContain=" + UPDATED_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where name equals to DEFAULT_NAME
+        defaultProductShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the productList where name equals to UPDATED_NAME
+        defaultProductShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultProductShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the productList where name equals to UPDATED_NAME
+        defaultProductShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where name is not null
+        defaultProductShouldBeFound("name.specified=true");
+
+        // Get all the productList where name is null
+        defaultProductShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByNameContainsSomething() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where name contains DEFAULT_NAME
+        defaultProductShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the productList where name contains UPDATED_NAME
+        defaultProductShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        productRepository.saveAndFlush(product);
+
+        // Get all the productList where name does not contain DEFAULT_NAME
+        defaultProductShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the productList where name does not contain UPDATED_NAME
+        defaultProductShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByCategoryIsEqualToSomething() throws Exception {
+        Category category;
+        if (TestUtil.findAll(em, Category.class).isEmpty()) {
+            productRepository.saveAndFlush(product);
+            category = CategoryResourceIT.createEntity(em);
+        } else {
+            category = TestUtil.findAll(em, Category.class).get(0);
+        }
+        em.persist(category);
+        em.flush();
+        product.setCategory(category);
+        productRepository.saveAndFlush(product);
+        Long categoryId = category.getId();
+        // Get all the productList where category equals to categoryId
+        defaultProductShouldBeFound("categoryId.equals=" + categoryId);
+
+        // Get all the productList where category equals to (categoryId + 1)
+        defaultProductShouldNotBeFound("categoryId.equals=" + (categoryId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsBySalesIsEqualToSomething() throws Exception {
+        Sale sales;
+        if (TestUtil.findAll(em, Sale.class).isEmpty()) {
+            productRepository.saveAndFlush(product);
+            sales = SaleResourceIT.createEntity(em);
+        } else {
+            sales = TestUtil.findAll(em, Sale.class).get(0);
+        }
+        em.persist(sales);
+        em.flush();
+        product.addSales(sales);
+        productRepository.saveAndFlush(product);
+        Long salesId = sales.getId();
+        // Get all the productList where sales equals to salesId
+        defaultProductShouldBeFound("salesId.equals=" + salesId);
+
+        // Get all the productList where sales equals to (salesId + 1)
+        defaultProductShouldNotBeFound("salesId.equals=" + (salesId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllProductsByTopSellingProductsViewIsEqualToSomething() throws Exception {
+        TopSellingProductsView topSellingProductsView;
+        if (TestUtil.findAll(em, TopSellingProductsView.class).isEmpty()) {
+            productRepository.saveAndFlush(product);
+            topSellingProductsView = TopSellingProductsViewResourceIT.createEntity(em);
+        } else {
+            topSellingProductsView = TestUtil.findAll(em, TopSellingProductsView.class).get(0);
+        }
+        em.persist(topSellingProductsView);
+        em.flush();
+        product.setTopSellingProductsView(topSellingProductsView);
+        topSellingProductsView.setProduct(product);
+        productRepository.saveAndFlush(product);
+        Long topSellingProductsViewId = topSellingProductsView.getId();
+        // Get all the productList where topSellingProductsView equals to topSellingProductsViewId
+        defaultProductShouldBeFound("topSellingProductsViewId.equals=" + topSellingProductsViewId);
+
+        // Get all the productList where topSellingProductsView equals to (topSellingProductsViewId + 1)
+        defaultProductShouldNotBeFound("topSellingProductsViewId.equals=" + (topSellingProductsViewId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultProductShouldBeFound(String filter) throws Exception {
+        restProductMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(product.getId().intValue())))
+            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
+
+        // Check, that the count call also returns 1
+        restProductMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultProductShouldNotBeFound(String filter) throws Exception {
+        restProductMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restProductMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

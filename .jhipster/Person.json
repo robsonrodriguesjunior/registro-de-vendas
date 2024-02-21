@@ -25,6 +25,7 @@
       "fieldValidateRules": ["required"]
     }
   ],
+  "jpaMetamodelFiltering": true,
   "name": "Person",
   "pagination": "pagination",
   "relationships": [
@@ -43,5 +44,6 @@
       "relationshipType": "one-to-one"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceClass"
 }

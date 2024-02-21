@@ -92,7 +92,7 @@ export class TopSellingProductsViewUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.productService
-      .query({ filter: 'topsellingproductsview-is-null' })
+      .query({ 'topSellingProductsViewId.specified': 'false' })
       .pipe(map((res: HttpResponse<IProduct[]>) => res.body ?? []))
       .pipe(
         map((products: IProduct[]) =>

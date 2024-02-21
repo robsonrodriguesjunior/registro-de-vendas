@@ -2,6 +2,9 @@ package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.SellersWhoEarnedMostView;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.SellersWhoEarnedMostViewRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.service.SellersWhoEarnedMostViewQueryService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.SellersWhoEarnedMostViewService;
+import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.SellersWhoEarnedMostViewCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -27,7 +29,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/sellers-who-earned-most-views")
-@Transactional
 public class SellersWhoEarnedMostViewResource {
 
     private final Logger log = LoggerFactory.getLogger(SellersWhoEarnedMostViewResource.class);
@@ -37,10 +38,20 @@ public class SellersWhoEarnedMostViewResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final SellersWhoEarnedMostViewService sellersWhoEarnedMostViewService;
+
     private final SellersWhoEarnedMostViewRepository sellersWhoEarnedMostViewRepository;
 
-    public SellersWhoEarnedMostViewResource(SellersWhoEarnedMostViewRepository sellersWhoEarnedMostViewRepository) {
+    private final SellersWhoEarnedMostViewQueryService sellersWhoEarnedMostViewQueryService;
+
+    public SellersWhoEarnedMostViewResource(
+        SellersWhoEarnedMostViewService sellersWhoEarnedMostViewService,
+        SellersWhoEarnedMostViewRepository sellersWhoEarnedMostViewRepository,
+        SellersWhoEarnedMostViewQueryService sellersWhoEarnedMostViewQueryService
+    ) {
+        this.sellersWhoEarnedMostViewService = sellersWhoEarnedMostViewService;
         this.sellersWhoEarnedMostViewRepository = sellersWhoEarnedMostViewRepository;
+        this.sellersWhoEarnedMostViewQueryService = sellersWhoEarnedMostViewQueryService;
     }
 
     /**
@@ -58,7 +69,7 @@ public class SellersWhoEarnedMostViewResource {
         if (sellersWhoEarnedMostView.getId() != null) {
             throw new BadRequestAlertException("A new sellersWhoEarnedMostView cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SellersWhoEarnedMostView result = sellersWhoEarnedMostViewRepository.save(sellersWhoEarnedMostView);
+        SellersWhoEarnedMostView result = sellersWhoEarnedMostViewService.save(sellersWhoEarnedMostView);
         return ResponseEntity
             .created(new URI("/api/sellers-who-earned-most-views/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -92,7 +103,7 @@ public class SellersWhoEarnedMostViewResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        SellersWhoEarnedMostView result = sellersWhoEarnedMostViewRepository.save(sellersWhoEarnedMostView);
+        SellersWhoEarnedMostView result = sellersWhoEarnedMostViewService.update(sellersWhoEarnedMostView);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, sellersWhoEarnedMostView.getId().toString()))
@@ -127,19 +138,7 @@ public class SellersWhoEarnedMostViewResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<SellersWhoEarnedMostView> result = sellersWhoEarnedMostViewRepository
-            .findById(sellersWhoEarnedMostView.getId())
-            .map(existingSellersWhoEarnedMostView -> {
-                if (sellersWhoEarnedMostView.getValue() != null) {
-                    existingSellersWhoEarnedMostView.setValue(sellersWhoEarnedMostView.getValue());
-                }
-                if (sellersWhoEarnedMostView.getPosition() != null) {
-                    existingSellersWhoEarnedMostView.setPosition(sellersWhoEarnedMostView.getPosition());
-                }
-
-                return existingSellersWhoEarnedMostView;
-            })
-            .map(sellersWhoEarnedMostViewRepository::save);
+        Optional<SellersWhoEarnedMostView> result = sellersWhoEarnedMostViewService.partialUpdate(sellersWhoEarnedMostView);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -151,16 +150,31 @@ public class SellersWhoEarnedMostViewResource {
      * {@code GET  /sellers-who-earned-most-views} : get all the sellersWhoEarnedMostViews.
      *
      * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of sellersWhoEarnedMostViews in body.
      */
     @GetMapping("")
     public ResponseEntity<List<SellersWhoEarnedMostView>> getAllSellersWhoEarnedMostViews(
+        SellersWhoEarnedMostViewCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
-        log.debug("REST request to get a page of SellersWhoEarnedMostViews");
-        Page<SellersWhoEarnedMostView> page = sellersWhoEarnedMostViewRepository.findAll(pageable);
+        log.debug("REST request to get SellersWhoEarnedMostViews by criteria: {}", criteria);
+
+        Page<SellersWhoEarnedMostView> page = sellersWhoEarnedMostViewQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /sellers-who-earned-most-views/count} : count all the sellersWhoEarnedMostViews.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> countSellersWhoEarnedMostViews(SellersWhoEarnedMostViewCriteria criteria) {
+        log.debug("REST request to count SellersWhoEarnedMostViews by criteria: {}", criteria);
+        return ResponseEntity.ok().body(sellersWhoEarnedMostViewQueryService.countByCriteria(criteria));
     }
 
     /**
@@ -172,7 +186,7 @@ public class SellersWhoEarnedMostViewResource {
     @GetMapping("/{id}")
     public ResponseEntity<SellersWhoEarnedMostView> getSellersWhoEarnedMostView(@PathVariable("id") Long id) {
         log.debug("REST request to get SellersWhoEarnedMostView : {}", id);
-        Optional<SellersWhoEarnedMostView> sellersWhoEarnedMostView = sellersWhoEarnedMostViewRepository.findById(id);
+        Optional<SellersWhoEarnedMostView> sellersWhoEarnedMostView = sellersWhoEarnedMostViewService.findOne(id);
         return ResponseUtil.wrapOrNotFound(sellersWhoEarnedMostView);
     }
 
@@ -185,7 +199,7 @@ public class SellersWhoEarnedMostViewResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSellersWhoEarnedMostView(@PathVariable("id") Long id) {
         log.debug("REST request to delete SellersWhoEarnedMostView : {}", id);
-        sellersWhoEarnedMostViewRepository.deleteById(id);
+        sellersWhoEarnedMostViewService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

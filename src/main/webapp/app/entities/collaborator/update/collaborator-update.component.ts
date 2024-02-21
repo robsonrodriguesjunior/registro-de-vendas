@@ -93,7 +93,7 @@ export class CollaboratorUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.personService
-      .query({ filter: 'seller-is-null' })
+      .query({ 'sellerId.specified': 'false' })
       .pipe(map((res: HttpResponse<IPerson[]>) => res.body ?? []))
       .pipe(map((people: IPerson[]) => this.personService.addPersonToCollectionIfMissing<IPerson>(people, this.collaborator?.person)))
       .subscribe((people: IPerson[]) => (this.peopleCollection = people));
