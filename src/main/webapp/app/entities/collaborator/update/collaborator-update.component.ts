@@ -1,19 +1,18 @@
-import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 
-import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import SharedModule from 'app/shared/shared.module';
 
-import { IPerson } from 'app/entities/person/person.model';
-import { PersonService } from 'app/entities/person/service/person.service';
-import { CollaboratorType } from 'app/entities/enumerations/collaborator-type.model';
 import { CollaboratorStatus } from 'app/entities/enumerations/collaborator-status.model';
-import { CollaboratorService } from '../service/collaborator.service';
+import { CollaboratorType } from 'app/entities/enumerations/collaborator-type.model';
+import { IPerson } from 'app/entities/person/person.model';
 import { ICollaborator } from '../collaborator.model';
-import { CollaboratorFormService, CollaboratorFormGroup } from './collaborator-form.service';
+import { CollaboratorService } from '../service/collaborator.service';
+import { CollaboratorFormGroup, CollaboratorFormService } from './collaborator-form.service';
 
 @Component({
   standalone: true,
@@ -34,11 +33,8 @@ export class CollaboratorUpdateComponent implements OnInit {
   constructor(
     protected collaboratorService: CollaboratorService,
     protected collaboratorFormService: CollaboratorFormService,
-    protected personService: PersonService,
     protected activatedRoute: ActivatedRoute,
   ) {}
-
-  comparePerson = (o1: IPerson | null, o2: IPerson | null): boolean => this.personService.comparePerson(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ collaborator }) => {
@@ -46,8 +42,6 @@ export class CollaboratorUpdateComponent implements OnInit {
       if (collaborator) {
         this.updateForm(collaborator);
       }
-
-      this.loadRelationshipsOptions();
     });
   }
 
@@ -87,15 +81,5 @@ export class CollaboratorUpdateComponent implements OnInit {
   protected updateForm(collaborator: ICollaborator): void {
     this.collaborator = collaborator;
     this.collaboratorFormService.resetForm(this.editForm, collaborator);
-
-    this.peopleCollection = this.personService.addPersonToCollectionIfMissing<IPerson>(this.peopleCollection, collaborator.person);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.personService
-      .query({ 'sellerId.specified': 'false' })
-      .pipe(map((res: HttpResponse<IPerson[]>) => res.body ?? []))
-      .pipe(map((people: IPerson[]) => this.personService.addPersonToCollectionIfMissing<IPerson>(people, this.collaborator?.person)))
-      .subscribe((people: IPerson[]) => (this.peopleCollection = people));
   }
 }

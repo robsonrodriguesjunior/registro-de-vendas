@@ -2,11 +2,6 @@ import { Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'person',
-    data: { pageTitle: 'registroDeVendasApp.person.home.title' },
-    loadChildren: () => import('./person/person.routes'),
-  },
-  {
     path: 'client',
     data: { pageTitle: 'registroDeVendasApp.client.home.title' },
     loadChildren: () => import('./client/client.routes'),
