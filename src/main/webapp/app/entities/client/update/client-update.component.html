@@ -36,23 +36,6 @@
             </div>
           }
         </div>
-
-        <div class="mb-3">
-          <label class="form-label" jhiTranslate="registroDeVendasApp.client.person" for="field_person">Person</label>
-          <select
-            class="form-control"
-            id="field_person"
-            data-cy="person"
-            name="person"
-            formControlName="person"
-            [compareWith]="comparePerson"
-          >
-            <option [ngValue]="null"></option>
-            @for (personOption of peopleCollection; track $index) {
-              <option [ngValue]="personOption">{{ personOption.id }}</option>
-            }
-          </select>
-        </div>
       </div>
 
       <div>

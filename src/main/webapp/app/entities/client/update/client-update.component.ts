@@ -1,17 +1,16 @@
-import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 
-import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import SharedModule from 'app/shared/shared.module';
 
 import { IPerson } from 'app/entities/person/person.model';
-import { PersonService } from 'app/entities/person/service/person.service';
 import { IClient } from '../client.model';
 import { ClientService } from '../service/client.service';
-import { ClientFormService, ClientFormGroup } from './client-form.service';
+import { ClientFormGroup, ClientFormService } from './client-form.service';
 
 @Component({
   standalone: true,
@@ -30,11 +29,8 @@ export class ClientUpdateComponent implements OnInit {
   constructor(
     protected clientService: ClientService,
     protected clientFormService: ClientFormService,
-    protected personService: PersonService,
     protected activatedRoute: ActivatedRoute,
   ) {}
-
-  comparePerson = (o1: IPerson | null, o2: IPerson | null): boolean => this.personService.comparePerson(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ client }) => {
@@ -42,8 +38,6 @@ export class ClientUpdateComponent implements OnInit {
       if (client) {
         this.updateForm(client);
       }
-
-      this.loadRelationshipsOptions();
     });
   }
 
@@ -83,15 +77,5 @@ export class ClientUpdateComponent implements OnInit {
   protected updateForm(client: IClient): void {
     this.client = client;
     this.clientFormService.resetForm(this.editForm, client);
-
-    this.peopleCollection = this.personService.addPersonToCollectionIfMissing<IPerson>(this.peopleCollection, client.person);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.personService
-      .query({ 'clientId.specified': 'false' })
-      .pipe(map((res: HttpResponse<IPerson[]>) => res.body ?? []))
-      .pipe(map((people: IPerson[]) => this.personService.addPersonToCollectionIfMissing<IPerson>(people, this.client?.person)))
-      .subscribe((people: IPerson[]) => (this.peopleCollection = people));
   }
 }
