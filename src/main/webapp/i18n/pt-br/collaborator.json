@@ -2,29 +2,25 @@
   "registroDeVendasApp": {
     "collaborator": {
       "home": {
-        "title": "Collaborators",
-        "refreshListLabel": "Atualizar lista",
+        "title": "Colaboradores",
         "createLabel": "Criar novo Collaborator",
-        "createOrEditLabel": "Criar ou editar Collaborator",
-        "notFound": "Nenhum Collaborator encontrado"
+        "createOrEditLabel": "Criar ou editar Colaborador",
+        "notFound": "Nenhum Colaborador encontrado"
       },
-      "created": "Um novo Collaborator foi criado com o identificador {{ param }}",
-      "updated": "Um Collaborator foi atualizado com o identificador {{ param }}",
-      "deleted": "Um Collaborator foi excluído com o identificador {{ param }}",
+      "created": "Um Colaborador foi criado com o identificador {{ param }}",
+      "updated": "Um Colaborador foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Colaborador foi excluído com o identificador {{ param }}",
       "delete": {
-        "question": "Tem certeza de que deseja excluir Collaborator {{ id }}?"
+        "question": "Tem certeza de que deseja excluir Colaborador {{ id }}?"
       },
       "detail": {
-        "title": "Collaborator"
+        "title": "Colaborador"
       },
       "id": "ID",
-      "code": "Code",
-      "type": "Type",
+      "code": "Código",
+      "type": "Tipo",
       "status": "Status",
-      "person": "Person",
-      "sales": "Sales",
-      "sellersWhoEarnedMostView": "Sellers Who Earned Most View",
-      "sellersWhoSoldMostProductsView": "Sellers Who Sold Most Products View"
+      "sales": "Vendas"
     }
   }
 }

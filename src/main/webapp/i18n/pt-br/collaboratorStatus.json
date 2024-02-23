@@ -2,8 +2,8 @@
   "registroDeVendasApp": {
     "CollaboratorStatus": {
       "null": "",
-      "ACTIVE": "ACTIVE",
-      "INACTIVE": "INACTIVE"
+      "ACTIVE": "Ativo",
+      "INACTIVE": "Inativo"
     }
   }
 }
