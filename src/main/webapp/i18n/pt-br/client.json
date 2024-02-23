@@ -2,25 +2,23 @@
   "registroDeVendasApp": {
     "client": {
       "home": {
-        "title": "Clients",
-        "refreshListLabel": "Atualizar lista",
-        "createLabel": "Criar novo Client",
-        "createOrEditLabel": "Criar ou editar Client",
-        "notFound": "Nenhum Client encontrado"
+        "title": "Clientes",
+        "createLabel": "Criar novo Cliente",
+        "createOrEditLabel": "Criar ou editar Cliente",
+        "notFound": "Nenhum Cliente encontrado"
       },
-      "created": "Um novo Client foi criado com o identificador {{ param }}",
-      "updated": "Um Client foi atualizado com o identificador {{ param }}",
-      "deleted": "Um Client foi excluído com o identificador {{ param }}",
+      "created": "Um Cliente foi criado com o identificador {{ param }}",
+      "updated": "Um Cliente foi atualizado com o identificador {{ param }}",
+      "deleted": "Um Cliente foi excluído com o identificador {{ param }}",
       "delete": {
-        "question": "Tem certeza de que deseja excluir Client {{ id }}?"
+        "question": "Tem certeza de que deseja excluir Cliente {{ id }}?"
       },
       "detail": {
-        "title": "Client"
+        "title": "Cliente"
       },
       "id": "ID",
-      "code": "Code",
-      "person": "Person",
-      "buys": "Buys"
+      "code": "Código",
+      "buys": "Compras"
     }
   }
 }
