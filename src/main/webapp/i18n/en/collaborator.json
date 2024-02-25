@@ -2,15 +2,14 @@
   "registroDeVendasApp": {
     "collaborator": {
       "home": {
-        "title": "Collaborators",
-        "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Collaborator",
-        "createOrEditLabel": "Create or edit a Collaborator",
+        "title": "Colaboradores",
+        "createLabel": "Create New Collaborator",
+        "createOrEditLabel": "Create or Edit Collaborator",
         "notFound": "No Collaborators found"
       },
-      "created": "A new Collaborator is created with identifier {{ param }}",
-      "updated": "A Collaborator is updated with identifier {{ param }}",
-      "deleted": "A Collaborator is deleted with identifier {{ param }}",
+      "created": "A Collaborator was created with identifier {{ param }}",
+      "updated": "A Collaborator was updated with identifier {{ param }}",
+      "deleted": "A Collaborator was deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete Collaborator {{ id }}?"
       },
@@ -21,10 +20,7 @@
       "code": "Code",
       "type": "Type",
       "status": "Status",
-      "person": "Person",
-      "sales": "Sales",
-      "sellersWhoEarnedMostView": "Sellers Who Earned Most View",
-      "sellersWhoSoldMostProductsView": "Sellers Who Sold Most Products View"
+      "sales": "Sales"
     }
   }
 }
