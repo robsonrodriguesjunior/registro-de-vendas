@@ -3,14 +3,13 @@
     "sale": {
       "home": {
         "title": "Sales",
-        "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Sale",
-        "createOrEditLabel": "Create or edit a Sale",
+        "createLabel": "Create New Sale",
+        "createOrEditLabel": "Create or Edit Sale",
         "notFound": "No Sales found"
       },
-      "created": "A new Sale is created with identifier {{ param }}",
-      "updated": "A Sale is updated with identifier {{ param }}",
-      "deleted": "A Sale is deleted with identifier {{ param }}",
+      "created": "A Sale was created with identifier {{ param }}",
+      "updated": "A Sale was updated with identifier {{ param }}",
+      "deleted": "A Sale was deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete Sale {{ id }}?"
       },

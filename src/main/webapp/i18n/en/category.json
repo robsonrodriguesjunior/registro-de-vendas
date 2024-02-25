@@ -3,24 +3,24 @@
     "category": {
       "home": {
         "title": "Categories",
-        "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Category",
-        "createOrEditLabel": "Create or edit a Category",
-        "notFound": "No Categories found"
+        "refreshListLabel": "Atualizar lista",
+        "createLabel": "Criar nova Categoria",
+        "createOrEditLabel": "Criar ou editar Categoria",
+        "notFound": "Nenhuma Categoria encontrada"
       },
-      "created": "A new Category is created with identifier {{ param }}",
-      "updated": "A Category is updated with identifier {{ param }}",
-      "deleted": "A Category is deleted with identifier {{ param }}",
+      "created": "Uma Categoria foi criada com o identificador {{ param }}",
+      "updated": "Uma Categoria foi atualizada com o identificador {{ param }}",
+      "deleted": "Uma Categoria foi excluída com o identificador {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Category {{ id }}?"
+        "question": "Tem certeza de que deseja excluir Categoria {{ id }}?"
       },
       "detail": {
-        "title": "Category"
+        "title": "Categoria"
       },
       "id": "ID",
-      "code": "Code",
-      "name": "Name",
-      "products": "Products"
+      "code": "Código",
+      "name": "Nome",
+      "products": "Produtos"
     }
   }
 }
