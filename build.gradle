@@ -204,6 +204,8 @@ dependencies {
     implementation "io.micrometer:micrometer-registry-prometheus"
     implementation "io.dropwizard.metrics:metrics-core"
     // jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 }
 
 if (project.hasProperty("gae")) {
