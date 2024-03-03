@@ -2,9 +2,7 @@ package com.github.robsonrodriguesjunior.registrodevendas.service;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CollaboratorRepository;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -13,7 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator}.
+ * Service Implementation for managing
+ * {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator}.
  */
 @Service
 @Transactional
@@ -86,32 +85,6 @@ public class CollaboratorService {
     public Page<Collaborator> findAll(Pageable pageable) {
         log.debug("Request to get all Collaborators");
         return collaboratorRepository.findAll(pageable);
-    }
-
-    /**
-     *  Get all the collaborators where SellersWhoEarnedMostView is {@code null}.
-     *  @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<Collaborator> findAllWhereSellersWhoEarnedMostViewIsNull() {
-        log.debug("Request to get all collaborators where SellersWhoEarnedMostView is null");
-        return StreamSupport
-            .stream(collaboratorRepository.findAll().spliterator(), false)
-            .filter(collaborator -> collaborator.getSellersWhoEarnedMostView() == null)
-            .toList();
-    }
-
-    /**
-     *  Get all the collaborators where SellersWhoSoldMostProductsView is {@code null}.
-     *  @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<Collaborator> findAllWhereSellersWhoSoldMostProductsViewIsNull() {
-        log.debug("Request to get all collaborators where SellersWhoSoldMostProductsView is null");
-        return StreamSupport
-            .stream(collaboratorRepository.findAll().spliterator(), false)
-            .filter(collaborator -> collaborator.getSellersWhoSoldMostProductsView() == null)
-            .toList();
     }
 
     /**

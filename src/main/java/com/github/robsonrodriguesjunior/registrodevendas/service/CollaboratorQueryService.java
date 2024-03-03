@@ -1,7 +1,10 @@
 package com.github.robsonrodriguesjunior.registrodevendas.service;
 
-import com.github.robsonrodriguesjunior.registrodevendas.domain.*; // for static metamodels
+// for static metamodels
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator_;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Person_;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Sale_;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CollaboratorRepository;
 import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.CollaboratorCriteria;
 import jakarta.persistence.criteria.JoinType;
@@ -16,10 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
 
 /**
- * Service for executing complex queries for {@link Collaborator} entities in the database.
- * The main input is a {@link CollaboratorCriteria} which gets converted to {@link Specification},
+ * Service for executing complex queries for {@link Collaborator} entities in
+ * the database.
+ * The main input is a {@link CollaboratorCriteria} which gets converted to
+ * {@link Specification},
  * in a way that all the filters must apply.
- * It returns a {@link List} of {@link Collaborator} or a {@link Page} of {@link Collaborator} which fulfills the criteria.
+ * It returns a {@link List} of {@link Collaborator} or a {@link Page} of
+ * {@link Collaborator} which fulfills the criteria.
  */
 @Service
 @Transactional(readOnly = true)
@@ -34,8 +40,11 @@ public class CollaboratorQueryService extends QueryService<Collaborator> {
     }
 
     /**
-     * Return a {@link List} of {@link Collaborator} which matches the criteria from the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
+     * Return a {@link List} of {@link Collaborator} which matches the criteria from
+     * the database.
+     *
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the matching entities.
      */
     @Transactional(readOnly = true)
@@ -46,9 +55,12 @@ public class CollaboratorQueryService extends QueryService<Collaborator> {
     }
 
     /**
-     * Return a {@link Page} of {@link Collaborator} which matches the criteria from the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
-     * @param page The page, which should be returned.
+     * Return a {@link Page} of {@link Collaborator} which matches the criteria from
+     * the database.
+     *
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
+     * @param page     The page, which should be returned.
      * @return the matching entities.
      */
     @Transactional(readOnly = true)
@@ -60,7 +72,9 @@ public class CollaboratorQueryService extends QueryService<Collaborator> {
 
     /**
      * Return the number of matching entities in the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
+     *
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the number of matching entities.
      */
     @Transactional(readOnly = true)
@@ -72,7 +86,9 @@ public class CollaboratorQueryService extends QueryService<Collaborator> {
 
     /**
      * Function to convert {@link CollaboratorCriteria} to a {@link Specification}
-     * @param criteria The object which holds all the filters, which the entities should match.
+     *
+     * @param criteria The object which holds all the filters, which the entities
+     *                 should match.
      * @return the matching {@link Specification} of the entity.
      */
     protected Specification<Collaborator> createSpecification(CollaboratorCriteria criteria) {
@@ -104,27 +120,6 @@ public class CollaboratorQueryService extends QueryService<Collaborator> {
                 specification =
                     specification.and(
                         buildSpecification(criteria.getSalesId(), root -> root.join(Collaborator_.sales, JoinType.LEFT).get(Sale_.id))
-                    );
-            }
-            if (criteria.getSellersWhoEarnedMostViewId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getSellersWhoEarnedMostViewId(),
-                            root -> root.join(Collaborator_.sellersWhoEarnedMostView, JoinType.LEFT).get(SellersWhoEarnedMostView_.id)
-                        )
-                    );
-            }
-            if (criteria.getSellersWhoSoldMostProductsViewId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getSellersWhoSoldMostProductsViewId(),
-                            root ->
-                                root
-                                    .join(Collaborator_.sellersWhoSoldMostProductsView, JoinType.LEFT)
-                                    .get(SellersWhoSoldMostProductsView_.id)
-                        )
                     );
             }
         }
