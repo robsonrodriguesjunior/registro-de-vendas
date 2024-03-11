@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Backend",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "projectName": "registro-de-vendas",
+      "mainClass": "com.github.robsonrodriguesjunior.registrodevendas.RegistroDeVendasApp",
+      "args": "--server.port=8080",
+      "preLaunchTask": "gradlew: clean compileJava -x webapp",
+      "vmArgs": "-Duser.timezone=UTC"
+    }
+  ]
+}
