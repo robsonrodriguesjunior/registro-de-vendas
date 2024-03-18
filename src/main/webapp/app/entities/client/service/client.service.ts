@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IClient, NewClient } from '../client.model';
+import { IClient } from '../client.model';
 
 export type PartialUpdateClient = Partial<IClient> & Pick<IClient, 'id'>;
 
@@ -21,16 +20,18 @@ export class ClientService {
     protected applicationConfigService: ApplicationConfigService,
   ) {}
 
-  create(client: NewClient): Observable<EntityResponseType> {
+  create(client: IClient): Observable<EntityResponseType> {
+    if (client.id) {
+      throw 'Client with id';
+    }
     return this.http.post<IClient>(this.resourceUrl, client, { observe: 'response' });
   }
 
   update(client: IClient): Observable<EntityResponseType> {
-    return this.http.put<IClient>(`${this.resourceUrl}/${this.getClientIdentifier(client)}`, client, { observe: 'response' });
-  }
-
-  partialUpdate(client: PartialUpdateClient): Observable<EntityResponseType> {
-    return this.http.patch<IClient>(`${this.resourceUrl}/${this.getClientIdentifier(client)}`, client, { observe: 'response' });
+    if (!client.id) {
+      throw 'Client without id';
+    }
+    return this.http.put<IClient>(`${this.resourceUrl}/${client.id}`, client, { observe: 'response' });
   }
 
   find(id: number): Observable<EntityResponseType> {
@@ -44,33 +45,5 @@ export class ClientService {
 
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
-  }
-
-  getClientIdentifier(client: Pick<IClient, 'id'>): number {
-    return client.id;
-  }
-
-  compareClient(o1: Pick<IClient, 'id'> | null, o2: Pick<IClient, 'id'> | null): boolean {
-    return o1 && o2 ? this.getClientIdentifier(o1) === this.getClientIdentifier(o2) : o1 === o2;
-  }
-
-  addClientToCollectionIfMissing<Type extends Pick<IClient, 'id'>>(
-    clientCollection: Type[],
-    ...clientsToCheck: (Type | null | undefined)[]
-  ): Type[] {
-    const clients: Type[] = clientsToCheck.filter(isPresent);
-    if (clients.length > 0) {
-      const clientCollectionIdentifiers = clientCollection.map(clientItem => this.getClientIdentifier(clientItem)!);
-      const clientsToAdd = clients.filter(clientItem => {
-        const clientIdentifier = this.getClientIdentifier(clientItem);
-        if (clientCollectionIdentifiers.includes(clientIdentifier)) {
-          return false;
-        }
-        clientCollectionIdentifiers.push(clientIdentifier);
-        return true;
-      });
-      return [...clientsToAdd, ...clientCollection];
-    }
-    return clientCollection;
   }
 }

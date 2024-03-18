@@ -2,21 +2,28 @@ package com.github.robsonrodriguesjunior.registrodevendas.service.criteria;
 
 import java.io.Serializable;
 import java.util.Objects;
+import lombok.Data;
 import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
 /**
- * Criteria class for the {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Person} entity. This class is used
- * in {@link com.github.robsonrodriguesjunior.registrodevendas.web.rest.PersonResource} to receive all the possible filtering options from
+ * Criteria class for the
+ * {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Person}
+ * entity. This class is used
+ * in
+ * {@link com.github.robsonrodriguesjunior.registrodevendas.web.rest.PersonResource}
+ * to receive all the possible filtering options from
  * the Http GET request parameters.
  * For example the following could be a valid request:
  * {@code /people?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
- * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
+ * As Spring is unable to properly convert the types, unless specific
+ * {@link Filter} class are used, we need to use
  * fix type specific filters.
  */
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
 public class PersonCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
@@ -28,6 +35,8 @@ public class PersonCriteria implements Serializable, Criteria {
     private StringFilter secondName;
 
     private LocalDateFilter birthday;
+
+    private StringFilter cpf;
 
     private LongFilter clientId;
 
@@ -42,6 +51,7 @@ public class PersonCriteria implements Serializable, Criteria {
         this.firstName = other.firstName == null ? null : other.firstName.copy();
         this.secondName = other.secondName == null ? null : other.secondName.copy();
         this.birthday = other.birthday == null ? null : other.birthday.copy();
+        this.cpf = other.cpf == null ? null : other.cpf.copy();
         this.clientId = other.clientId == null ? null : other.clientId.copy();
         this.sellerId = other.sellerId == null ? null : other.sellerId.copy();
         this.distinct = other.distinct;
@@ -179,13 +189,13 @@ public class PersonCriteria implements Serializable, Criteria {
     @Override
     public String toString() {
         return "PersonCriteria{" +
-            (id != null ? "id=" + id + ", " : "") +
-            (firstName != null ? "firstName=" + firstName + ", " : "") +
-            (secondName != null ? "secondName=" + secondName + ", " : "") +
-            (birthday != null ? "birthday=" + birthday + ", " : "") +
-            (clientId != null ? "clientId=" + clientId + ", " : "") +
-            (sellerId != null ? "sellerId=" + sellerId + ", " : "") +
-            (distinct != null ? "distinct=" + distinct + ", " : "") +
-            "}";
+                (id != null ? "id=" + id + ", " : "") +
+                (firstName != null ? "firstName=" + firstName + ", " : "") +
+                (secondName != null ? "secondName=" + secondName + ", " : "") +
+                (birthday != null ? "birthday=" + birthday + ", " : "") +
+                (clientId != null ? "clientId=" + clientId + ", " : "") +
+                (sellerId != null ? "sellerId=" + sellerId + ", " : "") +
+                (distinct != null ? "distinct=" + distinct + ", " : "") +
+                "}";
     }
 }

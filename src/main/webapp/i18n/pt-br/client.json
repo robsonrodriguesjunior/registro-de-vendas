@@ -18,7 +18,10 @@
       },
       "id": "ID",
       "code": "Código",
-      "buys": "Compras"
+      "firstName": "Primeiro nome",
+      "secondName": "Sobrenome",
+      "birthday": "Data de nascimento",
+      "cpf": "CPF"
     }
   }
 }

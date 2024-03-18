@@ -1,11 +1,10 @@
-import { IPerson } from 'app/entities/person/person.model';
-import { ISale } from 'app/entities/sale/sale.model';
+import dayjs from 'dayjs/esm';
 
 export interface IClient {
-  id: number;
+  id?: number;
   code?: string | null;
-  person?: IPerson | null;
-  buys?: ISale[] | null;
+  firstName?: string | null;
+  secondName?: string | null;
+  birthday?: dayjs.Dayjs | null;
+  cpf?: string | null;
 }
-
-export type NewClient = Omit<IClient, 'id'> & { id: null };

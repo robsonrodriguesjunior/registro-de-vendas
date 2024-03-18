@@ -1,13 +1,13 @@
 package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Client;
+import com.github.robsonrodriguesjunior.registrodevendas.dto.ClientRecord;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.ClientRepository;
 import com.github.robsonrodriguesjunior.registrodevendas.service.ClientQueryService;
 import com.github.robsonrodriguesjunior.registrodevendas.service.ClientService;
 import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.ClientCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -20,14 +20,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Client}.
+ * REST controller for managing
+ * {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Client}.
  */
 @RestController
 @RequestMapping("/api/clients")
@@ -52,46 +60,29 @@ public class ClientResource {
         this.clientQueryService = clientQueryService;
     }
 
-    /**
-     * {@code POST  /clients} : Create a new client.
-     *
-     * @param client the client to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new client, or with status {@code 400 (Bad Request)} if the client has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public ResponseEntity<Client> createClient(@Valid @RequestBody Client client) throws URISyntaxException {
-        log.debug("REST request to save Client : {}", client);
-        if (client.getId() != null) {
+    public ResponseEntity<Client> createClient(@Valid @RequestBody ClientRecord clientRecord) throws URISyntaxException {
+        log.debug("REST request to save Client : {}", clientRecord);
+        if (clientRecord.id() != null) {
             throw new BadRequestAlertException("A new client cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Client result = clientService.save(client);
+        Client result = clientService.save(clientRecord);
         return ResponseEntity
             .created(new URI("/api/clients/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
-    /**
-     * {@code PUT  /clients/:id} : Updates an existing client.
-     *
-     * @param id the id of the client to save.
-     * @param client the client to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated client,
-     * or with status {@code 400 (Bad Request)} if the client is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the client couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<Client> updateClient(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Client client
+        @Valid @RequestBody ClientRecord clientRecord
     ) throws URISyntaxException {
-        log.debug("REST request to update Client : {}, {}", id, client);
-        if (client.getId() == null) {
+        log.debug("REST request to update Client : {}, {}", id, clientRecord);
+        if (clientRecord.id() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, client.getId())) {
+        if (!Objects.equals(id, clientRecord.id())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -99,56 +90,13 @@ public class ClientResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Client result = clientService.update(client);
+        Client result = clientService.save(clientRecord);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, client.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
-    /**
-     * {@code PATCH  /clients/:id} : Partial updates given fields of an existing client, field will ignore if it is null
-     *
-     * @param id the id of the client to save.
-     * @param client the client to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated client,
-     * or with status {@code 400 (Bad Request)} if the client is not valid,
-     * or with status {@code 404 (Not Found)} if the client is not found,
-     * or with status {@code 500 (Internal Server Error)} if the client couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<Client> partialUpdateClient(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Client client
-    ) throws URISyntaxException {
-        log.debug("REST request to partial update Client partially : {}, {}", id, client);
-        if (client.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, client.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!clientRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<Client> result = clientService.partialUpdate(client);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, client.getId().toString())
-        );
-    }
-
-    /**
-     * {@code GET  /clients} : get all the clients.
-     *
-     * @param pageable the pagination information.
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of clients in body.
-     */
     @GetMapping("")
     public ResponseEntity<List<Client>> getAllClients(
         ClientCriteria criteria,
@@ -161,37 +109,19 @@ public class ClientResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    /**
-     * {@code GET  /clients/count} : count all the clients.
-     *
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-     */
     @GetMapping("/count")
     public ResponseEntity<Long> countClients(ClientCriteria criteria) {
         log.debug("REST request to count Clients by criteria: {}", criteria);
         return ResponseEntity.ok().body(clientQueryService.countByCriteria(criteria));
     }
 
-    /**
-     * {@code GET  /clients/:id} : get the "id" client.
-     *
-     * @param id the id of the client to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the client, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClient(@PathVariable("id") Long id) {
+    public ResponseEntity<ClientRecord> getClient(@PathVariable("id") Long id) {
         log.debug("REST request to get Client : {}", id);
         Optional<Client> client = clientService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(client);
+        return ResponseUtil.wrapOrNotFound(client.map(ClientRecord::of));
     }
 
-    /**
-     * {@code DELETE  /clients/:id} : delete the "id" client.
-     *
-     * @param id the id of the client to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable("id") Long id) {
         log.debug("REST request to delete Client : {}", id);

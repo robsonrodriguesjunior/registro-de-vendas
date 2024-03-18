@@ -20,13 +20,6 @@
             <span>{{ client.code }}</span>
           </dd>
           <dt><span jhiTranslate="registroDeVendasApp.client.person">Person</span></dt>
-          <dd>
-            @if (client.person) {
-              <div>
-                <a [routerLink]="['/person', client.person.id, 'view']">{{ client.person.id }}</a>
-              </div>
-            }
-          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

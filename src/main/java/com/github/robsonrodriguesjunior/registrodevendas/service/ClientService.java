@@ -1,7 +1,11 @@
 package com.github.robsonrodriguesjunior.registrodevendas.service;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Client;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Person;
+import com.github.robsonrodriguesjunior.registrodevendas.dto.ClientRecord;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.ClientRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.repository.PersonRepository;
+import jakarta.annotation.Nonnull;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Client}.
+ * Service Implementation for managing
+ * {@link com.github.robsonrodriguesjunior.registrodevendas.domain.Client}.
  */
 @Service
 @Transactional
@@ -21,82 +26,41 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
-    public ClientService(ClientRepository clientRepository) {
+    private final PersonRepository personRepository;
+
+    public ClientService(final ClientRepository clientRepository, final PersonRepository personRepository) {
         this.clientRepository = clientRepository;
+        this.personRepository = personRepository;
     }
 
-    /**
-     * Save a client.
-     *
-     * @param client the entity to save.
-     * @return the persisted entity.
-     */
-    public Client save(Client client) {
-        log.debug("Request to save Client : {}", client);
+    public Client save(@Nonnull final ClientRecord clientRecord) {
+        log.debug("Request to save Client : {}", clientRecord);
+
+        final var client = new Client(clientRecord);
+
+        personRepository.findOneByCpf(clientRecord.cpf()).ifPresentOrElse(client::setPerson, () -> client.setPerson(new Person()));
+
+        client.getPerson().setBirthday(clientRecord.birthday());
+        client.getPerson().setCpf(clientRecord.cpf());
+        client.getPerson().setFirstName(clientRecord.firstName());
+        client.getPerson().setSecondName(clientRecord.secondName());
+        client.setCode(clientRecord.code());
+
         return clientRepository.save(client);
     }
 
-    /**
-     * Update a client.
-     *
-     * @param client the entity to save.
-     * @return the persisted entity.
-     */
-    public Client update(Client client) {
-        log.debug("Request to update Client : {}", client);
-        return clientRepository.save(client);
-    }
-
-    /**
-     * Partially update a client.
-     *
-     * @param client the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Optional<Client> partialUpdate(Client client) {
-        log.debug("Request to partially update Client : {}", client);
-
-        return clientRepository
-            .findById(client.getId())
-            .map(existingClient -> {
-                if (client.getCode() != null) {
-                    existingClient.setCode(client.getCode());
-                }
-
-                return existingClient;
-            })
-            .map(clientRepository::save);
-    }
-
-    /**
-     * Get all the clients.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
     public Page<Client> findAll(Pageable pageable) {
         log.debug("Request to get all Clients");
         return clientRepository.findAll(pageable);
     }
 
-    /**
-     * Get one client by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
     public Optional<Client> findOne(Long id) {
         log.debug("Request to get Client : {}", id);
         return clientRepository.findById(id);
     }
 
-    /**
-     * Delete the client by id.
-     *
-     * @param id the id of the entity.
-     */
     public void delete(Long id) {
         log.debug("Request to delete Client : {}", id);
         clientRepository.deleteById(id);

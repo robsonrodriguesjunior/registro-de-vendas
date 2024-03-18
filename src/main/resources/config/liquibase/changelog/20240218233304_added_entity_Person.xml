@@ -23,6 +23,9 @@
             <column name="birthday" type="date">
                 <constraints nullable="false" />
             </column>
+                <column name="cpf" type="text">
+                <constraints nullable="false" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
@@ -47,6 +50,7 @@
             <column name="first_name" type="string"/>
             <column name="second_name" type="string"/>
             <column name="birthday" type="date"/>
+            <column name="cpf" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

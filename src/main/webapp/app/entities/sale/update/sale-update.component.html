@@ -45,14 +45,7 @@
 
         <div class="mb-3">
           <label class="form-label" jhiTranslate="registroDeVendasApp.sale.client" for="field_client">Client</label>
-          <select
-            class="form-control"
-            id="field_client"
-            data-cy="client"
-            name="client"
-            formControlName="client"
-            [compareWith]="compareClient"
-          >
+          <select class="form-control" id="field_client" data-cy="client" name="client" formControlName="client">
             @if (editForm.get(['client'])!.value == null) {
               <option [ngValue]="null" selected></option>
             }
