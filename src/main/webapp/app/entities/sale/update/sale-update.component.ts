@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import SharedModule from 'app/shared/shared.module';
 
 import { IClient } from 'app/entities/client/client.model';
 import { ClientService } from 'app/entities/client/service/client.service';
 import { ICollaborator } from 'app/entities/collaborator/collaborator.model';
 import { CollaboratorService } from 'app/entities/collaborator/service/collaborator.service';
-import { SaleService } from '../service/sale.service';
 import { ISale } from '../sale.model';
-import { SaleFormService, SaleFormGroup } from './sale-form.service';
+import { SaleService } from '../service/sale.service';
+import { SaleFormGroup, SaleFormService } from './sale-form.service';
 
 @Component({
   standalone: true,
@@ -37,8 +37,6 @@ export class SaleUpdateComponent implements OnInit {
     protected collaboratorService: CollaboratorService,
     protected activatedRoute: ActivatedRoute,
   ) {}
-
-  compareClient = (o1: IClient | null, o2: IClient | null): boolean => this.clientService.compareClient(o1, o2);
 
   compareCollaborator = (o1: ICollaborator | null, o2: ICollaborator | null): boolean =>
     this.collaboratorService.compareCollaborator(o1, o2);
@@ -91,7 +89,6 @@ export class SaleUpdateComponent implements OnInit {
     this.sale = sale;
     this.saleFormService.resetForm(this.editForm, sale);
 
-    this.clientsSharedCollection = this.clientService.addClientToCollectionIfMissing<IClient>(this.clientsSharedCollection, sale.client);
     this.collaboratorsSharedCollection = this.collaboratorService.addCollaboratorToCollectionIfMissing<ICollaborator>(
       this.collaboratorsSharedCollection,
       sale.seller,
@@ -102,7 +99,6 @@ export class SaleUpdateComponent implements OnInit {
     this.clientService
       .query()
       .pipe(map((res: HttpResponse<IClient[]>) => res.body ?? []))
-      .pipe(map((clients: IClient[]) => this.clientService.addClientToCollectionIfMissing<IClient>(clients, this.sale?.client)))
       .subscribe((clients: IClient[]) => (this.clientsSharedCollection = clients));
 
     this.collaboratorService

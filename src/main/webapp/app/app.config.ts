@@ -1,19 +1,22 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ApplicationConfig, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { RouterFeatures, TitleStrategy, provideRouter, withComponentInputBinding, withDebugTracing } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { HttpClientModule } from '@angular/common/http';
 
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 
 import { DEBUG_INFO_ENABLED } from 'app/app.constants';
-import './config/dayjs';
-import { TranslationModule } from 'app/shared/language/translation.module';
 import { httpInterceptorProviders } from 'app/core/interceptor/index';
+import { TranslationModule } from 'app/shared/language/translation.module';
 import routes from './app.routes';
+import './config/dayjs';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
-import { NgbDateDayjsAdapter } from './config/datepicker-adapter';
+import { registerLocaleData } from '@angular/common';
+import ptBr from '@angular/common/locales/pt';
 import { AppPageTitleStrategy } from './app-page-title-strategy';
+import { NgbDateDayjsAdapter } from './config/datepicker-adapter';
+registerLocaleData(ptBr);
 
 const routerFeatures: Array<RouterFeatures> = [withComponentInputBinding()];
 if (DEBUG_INFO_ENABLED) {
@@ -29,7 +32,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(TranslationModule),
     importProvidersFrom(HttpClientModule),
     Title,
-    { provide: LOCALE_ID, useValue: 'pt' },
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
     httpInterceptorProviders,
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },

@@ -1,13 +1,14 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgModule } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbDateParserFormatter, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { AlertErrorComponent } from './alert/alert-error.component';
+import { AlertComponent } from './alert/alert.component';
+import { NgbDateCustomParserFormatter } from './date/ngb-date-custom-parser-formatter';
 import FindLanguageFromKeyPipe from './language/find-language-from-key.pipe';
 import TranslateDirective from './language/translate.directive';
-import { AlertComponent } from './alert/alert.component';
-import { AlertErrorComponent } from './alert/alert-error.component';
 
 /**
  * Application wide Module
@@ -24,5 +25,6 @@ import { AlertErrorComponent } from './alert/alert-error.component';
     FindLanguageFromKeyPipe,
     TranslateDirective,
   ],
+  providers: [{ provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter }],
 })
 export default class SharedModule {}

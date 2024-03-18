@@ -1,21 +1,21 @@
-import { Component, OnInit } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { combineLatest, filter, Observable, switchMap, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, combineLatest, filter, switchMap, tap } from 'rxjs';
 
-import SharedModule from 'app/shared/shared.module';
-import { SortDirective, SortByDirective } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
-import { ItemCountComponent } from 'app/shared/pagination';
 import { FormsModule } from '@angular/forms';
+import { ASC, DEFAULT_SORT_DATA, DESC, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
-import { ASC, DESC, SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
-import { FilterComponent, FilterOptions, IFilterOptions, IFilterOption } from 'app/shared/filter';
+import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
+import { FilterComponent, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
+import { ItemCountComponent } from 'app/shared/pagination';
+import SharedModule from 'app/shared/shared.module';
+import { SortByDirective, SortDirective } from 'app/shared/sort';
 import { IClient } from '../client.model';
 
-import { EntityArrayResponseType, ClientService } from '../service/client.service';
 import { ClientDeleteDialogComponent } from '../delete/client-delete-dialog.component';
+import { ClientService, EntityArrayResponseType } from '../service/client.service';
 
 @Component({
   standalone: true,
@@ -53,7 +53,7 @@ export class ClientComponent implements OnInit {
     protected modalService: NgbModal,
   ) {}
 
-  trackId = (_index: number, item: IClient): number => this.clientService.getClientIdentifier(item);
+  trackId = (_index: number, item: IClient): number => item.id ?? 0;
 
   ngOnInit(): void {
     this.load();

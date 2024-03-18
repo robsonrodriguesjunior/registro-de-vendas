@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ASC } from 'app/config/navigation.constants';
-import { ClientComponent } from './list/client.component';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ClientDetailComponent } from './detail/client-detail.component';
-import { ClientUpdateComponent } from './update/client-update.component';
+import { ClientComponent } from './list/client.component';
 import ClientResolve from './route/client-routing-resolve.service';
+import { ClientUpdateComponent } from './update/client-update.component';
 
 const clientRoute: Routes = [
   {

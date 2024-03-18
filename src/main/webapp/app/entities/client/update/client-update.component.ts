@@ -7,10 +7,9 @@ import { finalize } from 'rxjs/operators';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import SharedModule from 'app/shared/shared.module';
 
-import { IPerson } from 'app/entities/person/person.model';
+import { AlertService } from 'app/core/util/alert.service';
 import { IClient } from '../client.model';
 import { ClientService } from '../service/client.service';
-import { ClientFormGroup, ClientFormService } from './client-form.service';
 
 @Component({
   standalone: true,
@@ -20,23 +19,18 @@ import { ClientFormGroup, ClientFormService } from './client-form.service';
 })
 export class ClientUpdateComponent implements OnInit {
   isSaving = false;
-  client: IClient | null = null;
-
-  peopleCollection: IPerson[] = [];
-
-  editForm: ClientFormGroup = this.clientFormService.createClientFormGroup();
+  client: IClient = {};
 
   constructor(
     protected clientService: ClientService,
-    protected clientFormService: ClientFormService,
     protected activatedRoute: ActivatedRoute,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ client }) => {
-      this.client = client;
       if (client) {
-        this.updateForm(client);
+        this.client = client;
       }
     });
   }
@@ -47,11 +41,12 @@ export class ClientUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const client = this.clientFormService.getClient(this.editForm);
-    if (client.id !== null) {
-      this.subscribeToSaveResponse(this.clientService.update(client));
+    if (this.client.id) {
+      this.subscribeToSaveResponse(this.clientService.update(this.client));
+      this.alertService.addAlert({ type: 'danger', message: 'Salvou' });
     } else {
-      this.subscribeToSaveResponse(this.clientService.create(client));
+      this.subscribeToSaveResponse(this.clientService.create(this.client));
+      this.alertService.addAlert({ type: 'danger', message: 'Ocorreu um erro' });
     }
   }
 
@@ -74,8 +69,7 @@ export class ClientUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  protected updateForm(client: IClient): void {
-    this.client = client;
-    this.clientFormService.resetForm(this.editForm, client);
+  private isNew(): boolean {
+    return !!this.client.id;
   }
 }

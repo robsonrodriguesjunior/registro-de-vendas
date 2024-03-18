@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <form #form="ngForm" name="editForm" role="form" novalidate (ngSubmit)="save()">
       <h2 id="jhi-client-heading" data-cy="ClientCreateUpdateHeading" jhiTranslate="registroDeVendasApp.client.home.createOrEditLabel">
         Criar ou editar Client
       </h2>
@@ -8,27 +8,143 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        @if (editForm.controls.id.value !== null) {
+        @if (client.id) {
           <div class="mb-3">
             <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+            <input [ngModel]="client.id" #id type="number" class="form-control" name="id" [readonly]="true" />
           </div>
         }
 
         <div class="mb-3">
           <label class="form-label" jhiTranslate="registroDeVendasApp.client.code" for="field_code">Code</label>
-          <input type="text" class="form-control" name="code" id="field_code" data-cy="code" formControlName="code" />
-          @if (editForm.get('code')!.invalid && (editForm.get('code')!.dirty || editForm.get('code')!.touched)) {
+          <input
+            [(ngModel)]="client.code"
+            #code="ngModel"
+            type="text"
+            class="form-control"
+            name="code"
+            [required]="true"
+            [minlength]="1"
+            [maxlength]="255"
+          />
+          @if (code.invalid && (code.dirty || code.touched)) {
             <div>
-              @if (editForm.get('code')?.errors?.required) {
+              @if (code.errors?.required) {
                 <small class="form-text text-danger" jhiTranslate="entity.validation.required">O campo é obrigatório.</small>
               }
-              @if (editForm.get('code')?.errors?.minlength) {
+              @if (code.errors?.minlength) {
                 <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: 1 }"
                   >Este campo deve ter pelo menos 1 caracteres.</small
                 >
               }
-              @if (editForm.get('code')?.errors?.maxlength) {
+              @if (code.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 255 }"
+                  >Este campo não pode ter mais de 255 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" jhiTranslate="registroDeVendasApp.client.firstName" for="field_firstName">First Name</label>
+          <input
+            [(ngModel)]="client.firstName"
+            #firstName="ngModel"
+            type="text"
+            class="form-control"
+            name="firstName"
+            [required]="true"
+            [minlength]="1"
+            [maxlength]="255"
+          />
+          @if (firstName.invalid && (firstName.dirty || firstName.touched)) {
+            <div>
+              @if (firstName.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">O campo é obrigatório.</small>
+              }
+              @if (firstName.errors?.minlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: 1 }"
+                  >Este campo deve ter pelo menos 1 caracteres.</small
+                >
+              }
+              @if (firstName.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 255 }"
+                  >Este campo não pode ter mais de 255 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" jhiTranslate="registroDeVendasApp.client.secondName" for="field_secondName">Second Name</label>
+          <input
+            [(ngModel)]="client.secondName"
+            #secondName="ngModel"
+            type="text"
+            class="form-control"
+            name="secondName"
+            [required]="true"
+            [minlength]="1"
+            [maxlength]="255"
+          />
+          @if (secondName.invalid && (secondName.dirty || secondName.touched)) {
+            <div>
+              @if (secondName.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">O campo é obrigatório.</small>
+              }
+              @if (secondName.errors?.minlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: 1 }"
+                  >Este campo deve ter pelo menos 1 caracteres.</small
+                >
+              }
+              @if (secondName.errors?.maxlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 255 }"
+                  >Este campo não pode ter mais de 255 caracteres.</small
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" jhiTranslate="registroDeVendasApp.client.birthday" for="field_birthday">Birthday</label>
+          <div class="input-group">
+            <input [(ngModel)]="client.birthday" #birthday="ngModel" type="date" class="form-control" name="birthday" [required]="true" />
+          </div>
+          @if (birthday.invalid && (birthday.dirty || birthday.touched)) {
+            <div>
+              @if (birthday.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">O campo é obrigatório.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" jhiTranslate="registroDeVendasApp.client.cpf" for="cpf">CPF</label>
+          <input
+            [(ngModel)]="client.cpf"
+            #cpf="ngModel"
+            type="text"
+            class="form-control"
+            name="cpf"
+            [required]="true"
+            [minlength]="1"
+            [maxlength]="255"
+          />
+          @if (cpf.invalid && (cpf.dirty || cpf.touched)) {
+            <div>
+              @if (cpf.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">O campo é obrigatório.</small>
+              }
+              @if (cpf.errors?.minlength) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: 1 }"
+                  >Este campo deve ter pelo menos 1 caracteres.</small
+                >
+              }
+              @if (cpf.errors?.maxlength) {
                 <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 255 }"
                   >Este campo não pode ter mais de 255 caracteres.</small
                 >
@@ -47,7 +163,7 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
+          [disabled]="form.invalid || isSaving"
           class="btn btn-primary"
         >
           <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Salvar</span>

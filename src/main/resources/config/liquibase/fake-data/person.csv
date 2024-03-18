@@ -1,11 +1,11 @@
-id;first_name;second_name;birthday
-1;Helena;teletype sedately amongst;2024-02-18
-2;Eduardo;dough yum really;2024-02-18
-3;Carla;incentivize;2024-02-18
-4;Ricardo;mmm lamp;2024-02-18
-5;Felícia;if neglected;2024-02-18
-6;Liz;reluctantly;2024-02-18
-7;Dalila;thankfully;2024-02-18
-8;Aline;concerning;2024-02-18
-9;Lucca;behind;2024-02-18
-10;Yasmin;tepid yahoo;2024-02-18
+id;first_name;second_name;birthday;cpf
+1;Helena;teletype sedately amongst;2024-02-18;797.395.700-62
+2;Eduardo;dough yum really;2024-02-18;797.395.700-62
+3;Carla;incentivize;2024-02-18;797.395.700-62
+4;Ricardo;mmm lamp;2024-02-18;797.395.700-62
+5;Felícia;if neglected;2024-02-18;797.395.700-62
+6;Liz;reluctantly;2024-02-18;797.395.700-62
+7;Dalila;thankfully;2024-02-18;797.395.700-62
+8;Aline;concerning;2024-02-18;797.395.700-62
+9;Lucca;behind;2024-02-18;797.395.700-62
+10;Yasmin;tepid yahoo;2024-02-18;797.395.700-62

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import org.hibernate.validator.constraints.br.CPF;
 
 public record CollaboratorRecord(
     Long id,
@@ -14,5 +15,6 @@ public record CollaboratorRecord(
     @NotNull CollaboratorStatus status,
     @NotNull @NotBlank @Size(max = 255) String firstName,
     @NotNull @NotBlank @Size(max = 255) String secondName,
-    @NotNull LocalDate birthday
+    @NotNull LocalDate birthday,
+    @NotNull @NotBlank @CPF String cpf
 ) {}
