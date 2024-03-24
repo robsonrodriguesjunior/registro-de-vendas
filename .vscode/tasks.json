@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "gradlew: clean compileJava -x webapp",
+      "label": "build",
       "type": "shell",
       "command": "./gradlew",
       "args": ["clean", "compileJava", "-x", "webapp"],
@@ -10,7 +10,6 @@
         "kind": "build",
         "isDefault": true
       },
-      "dependsOn": "build",
       "problemMatcher": "$gradle"
     }
   ]
