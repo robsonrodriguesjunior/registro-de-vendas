@@ -4,6 +4,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDateParserFormatter, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { ButtonModule } from 'primeng/button';
 import { AlertErrorComponent } from './alert/alert-error.component';
 import { AlertComponent } from './alert/alert.component';
 import { NgbDateCustomParserFormatter } from './date/ngb-date-custom-parser-formatter';
@@ -14,7 +15,7 @@ import TranslateDirective from './language/translate.directive';
  * Application wide Module
  */
 @NgModule({
-  imports: [AlertComponent, AlertErrorComponent, FindLanguageFromKeyPipe, TranslateDirective],
+  imports: [AlertComponent, AlertErrorComponent, FindLanguageFromKeyPipe, TranslateDirective, ButtonModule],
   exports: [
     CommonModule,
     NgbModule,
@@ -24,6 +25,7 @@ import TranslateDirective from './language/translate.directive';
     TranslateModule,
     FindLanguageFromKeyPipe,
     TranslateDirective,
+    ButtonModule,
   ],
   providers: [{ provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter }],
 })
