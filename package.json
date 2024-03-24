@@ -88,6 +88,8 @@
     "bootswatch": "5.3.2",
     "dayjs": "1.11.10",
     "ngx-infinite-scroll": "17.0.0",
+    "primeicons": "^6.0.1",
+    "primeng": "^17.12.0",
     "rxjs": "7.8.1",
     "tslib": "2.6.2",
     "zone.js": "0.14.2"
@@ -97,6 +99,7 @@
     "@angular-builders/jest": "17.0.0",
     "@angular-devkit/build-angular": "17.0.6",
     "@angular-eslint/eslint-plugin": "17.1.1",
+    "@angular/animations": "17.0.6",
     "@angular/cli": "17.0.6",
     "@angular/compiler-cli": "17.0.6",
     "@angular/service-worker": "17.0.6",
