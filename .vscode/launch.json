@@ -9,7 +9,7 @@
       "projectName": "registro-de-vendas",
       "mainClass": "com.github.robsonrodriguesjunior.registrodevendas.RegistroDeVendasApp",
       "args": "--server.port=8080",
-      "preLaunchTask": "gradlew: clean compileJava -x webapp",
+      "preLaunchTask": "build",
       "vmArgs": "-Duser.timezone=UTC"
     }
   ]
