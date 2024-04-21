@@ -21,10 +21,10 @@ public record ClientRecord(
     public static ClientRecord of(@Nonnull Client client) {
         final var id = client.getId();
         final var code = client.getCode();
-        final var firstName = Optional.ofNullable(client.getPerson()).map(Person::getFirstName).orElse("");
-        final var secondName = Optional.ofNullable(client.getPerson()).map(Person::getSecondName).orElse("");
-        final var birthday = Optional.ofNullable(client.getPerson()).map(Person::getBirthday).orElse(LocalDate.now());
-        final var cpf = Optional.ofNullable(client.getPerson()).map(Person::getCpf).orElse("kspskps");
+        final var firstName = Optional.ofNullable(client.getPerson()).map(Person::getFirstName).orElse(null);
+        final var secondName = Optional.ofNullable(client.getPerson()).map(Person::getSecondName).orElse(null);
+        final var birthday = Optional.ofNullable(client.getPerson()).map(Person::getBirthday).orElse(null);
+        final var cpf = Optional.ofNullable(client.getPerson()).map(Person::getCpf).orElse(null);
 
         return new ClientRecord(id, code, firstName, secondName, birthday, cpf);
     }

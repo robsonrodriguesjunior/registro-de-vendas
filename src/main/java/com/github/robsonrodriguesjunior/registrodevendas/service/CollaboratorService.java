@@ -1,7 +1,11 @@
 package com.github.robsonrodriguesjunior.registrodevendas.service;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
+import com.github.robsonrodriguesjunior.registrodevendas.domain.Person;
+import com.github.robsonrodriguesjunior.registrodevendas.dto.CollaboratorRecord;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CollaboratorRepository;
+import com.github.robsonrodriguesjunior.registrodevendas.repository.PersonRepository;
+import jakarta.annotation.Nonnull;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,88 +26,45 @@ public class CollaboratorService {
 
     private final CollaboratorRepository collaboratorRepository;
 
-    public CollaboratorService(CollaboratorRepository collaboratorRepository) {
+    private final PersonRepository personRepository;
+
+    public CollaboratorService(final CollaboratorRepository collaboratorRepository, final PersonRepository personRepository) {
         this.collaboratorRepository = collaboratorRepository;
+        this.personRepository = personRepository;
     }
 
-    /**
-     * Save a collaborator.
-     *
-     * @param collaborator the entity to save.
-     * @return the persisted entity.
-     */
-    public Collaborator save(Collaborator collaborator) {
-        log.debug("Request to save Collaborator : {}", collaborator);
+    public Collaborator save(@Nonnull final CollaboratorRecord collaboratorRecord) {
+        log.debug("Request to save Collaborator : {}", collaboratorRecord);
+
+        final var collaborator = new Collaborator();
+
+        personRepository
+            .findOneByCpf(collaboratorRecord.cpf())
+            .ifPresentOrElse(collaborator::setPerson, () -> collaborator.setPerson(new Person()));
+
+        collaborator.getPerson().setBirthday(collaboratorRecord.birthday());
+        collaborator.getPerson().setCpf(collaboratorRecord.cpf());
+        collaborator.getPerson().setFirstName(collaboratorRecord.firstName());
+        collaborator.getPerson().setSecondName(collaboratorRecord.secondName());
+        collaborator.setCode(collaboratorRecord.code());
+        collaborator.setType(collaboratorRecord.type());
+        collaborator.setStatus(collaboratorRecord.status());
+
         return collaboratorRepository.save(collaborator);
     }
 
-    /**
-     * Update a collaborator.
-     *
-     * @param collaborator the entity to save.
-     * @return the persisted entity.
-     */
-    public Collaborator update(Collaborator collaborator) {
-        log.debug("Request to update Collaborator : {}", collaborator);
-        return collaboratorRepository.save(collaborator);
-    }
-
-    /**
-     * Partially update a collaborator.
-     *
-     * @param collaborator the entity to update partially.
-     * @return the persisted entity.
-     */
-    public Optional<Collaborator> partialUpdate(Collaborator collaborator) {
-        log.debug("Request to partially update Collaborator : {}", collaborator);
-
-        return collaboratorRepository
-            .findById(collaborator.getId())
-            .map(existingCollaborator -> {
-                if (collaborator.getCode() != null) {
-                    existingCollaborator.setCode(collaborator.getCode());
-                }
-                if (collaborator.getType() != null) {
-                    existingCollaborator.setType(collaborator.getType());
-                }
-                if (collaborator.getStatus() != null) {
-                    existingCollaborator.setStatus(collaborator.getStatus());
-                }
-
-                return existingCollaborator;
-            })
-            .map(collaboratorRepository::save);
-    }
-
-    /**
-     * Get all the collaborators.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
     @Transactional(readOnly = true)
     public Page<Collaborator> findAll(Pageable pageable) {
         log.debug("Request to get all Collaborators");
         return collaboratorRepository.findAll(pageable);
     }
 
-    /**
-     * Get one collaborator by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
     @Transactional(readOnly = true)
     public Optional<Collaborator> findOne(Long id) {
         log.debug("Request to get Collaborator : {}", id);
         return collaboratorRepository.findById(id);
     }
 
-    /**
-     * Delete the collaborator by id.
-     *
-     * @param id the id of the entity.
-     */
     public void delete(Long id) {
         log.debug("Request to delete Collaborator : {}", id);
         collaboratorRepository.deleteById(id);

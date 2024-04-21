@@ -12,3 +12,7 @@ eg $input-color: red;
 @import 'bootswatch/dist/united/bootswatch';
 
 /* jhipster-needle-scss-add-vendor JHipster will add new css style */
+
+// primeng
+@import 'primeng-sass-theme-main/themes/bootstrap4/bootstrap4-light/blue/theme.scss';
+@import 'primeng/resources/primeng.css';
