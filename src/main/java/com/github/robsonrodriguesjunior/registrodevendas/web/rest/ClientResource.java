@@ -61,7 +61,7 @@ public class ClientResource {
     }
 
     @PostMapping("")
-    public ResponseEntity<Client> createClient(@Valid @RequestBody ClientRecord clientRecord) throws URISyntaxException {
+    public ResponseEntity<ClientRecord> createClient(@Valid @RequestBody ClientRecord clientRecord) throws URISyntaxException {
         log.debug("REST request to save Client : {}", clientRecord);
         if (clientRecord.id() != null) {
             throw new BadRequestAlertException("A new client cannot already have an ID", ENTITY_NAME, "idexists");
@@ -70,11 +70,11 @@ public class ClientResource {
         return ResponseEntity
             .created(new URI("/api/clients/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+            .body(ClientRecord.of(result));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClient(
+    public ResponseEntity<ClientRecord> updateClient(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ClientRecord clientRecord
     ) throws URISyntaxException {
@@ -94,17 +94,17 @@ public class ClientResource {
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+            .body(ClientRecord.of(result));
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Client>> getAllClients(
+    public ResponseEntity<List<ClientRecord>> getAllClients(
         ClientCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         log.debug("REST request to get Clients by criteria: {}", criteria);
 
-        Page<Client> page = clientQueryService.findByCriteria(criteria, pageable);
+        Page<ClientRecord> page = clientQueryService.findByCriteria(criteria, pageable).map(ClientRecord::of);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

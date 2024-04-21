@@ -1,13 +1,13 @@
 package com.github.robsonrodriguesjunior.registrodevendas.web.rest;
 
 import com.github.robsonrodriguesjunior.registrodevendas.domain.Collaborator;
+import com.github.robsonrodriguesjunior.registrodevendas.dto.CollaboratorRecord;
 import com.github.robsonrodriguesjunior.registrodevendas.repository.CollaboratorRepository;
 import com.github.robsonrodriguesjunior.registrodevendas.service.CollaboratorQueryService;
 import com.github.robsonrodriguesjunior.registrodevendas.service.CollaboratorService;
 import com.github.robsonrodriguesjunior.registrodevendas.service.criteria.CollaboratorCriteria;
 import com.github.robsonrodriguesjunior.registrodevendas.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -20,7 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -56,46 +63,30 @@ public class CollaboratorResource {
         this.collaboratorQueryService = collaboratorQueryService;
     }
 
-    /**
-     * {@code POST  /collaborators} : Create a new collaborator.
-     *
-     * @param collaborator the collaborator to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new collaborator, or with status {@code 400 (Bad Request)} if the collaborator has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
-    public ResponseEntity<Collaborator> createCollaborator(@Valid @RequestBody Collaborator collaborator) throws URISyntaxException {
-        log.debug("REST request to save Collaborator : {}", collaborator);
-        if (collaborator.getId() != null) {
+    public ResponseEntity<CollaboratorRecord> createCollaborator(@Valid @RequestBody CollaboratorRecord collaboratorRecord)
+        throws URISyntaxException {
+        log.debug("REST request to save Collaborator : {}", collaboratorRecord);
+        if (collaboratorRecord.id() != null) {
             throw new BadRequestAlertException("A new collaborator cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Collaborator result = collaboratorService.save(collaborator);
+        Collaborator result = collaboratorService.save(collaboratorRecord);
         return ResponseEntity
             .created(new URI("/api/collaborators/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+            .body(CollaboratorRecord.of(result));
     }
 
-    /**
-     * {@code PUT  /collaborators/:id} : Updates an existing collaborator.
-     *
-     * @param id the id of the collaborator to save.
-     * @param collaborator the collaborator to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated collaborator,
-     * or with status {@code 400 (Bad Request)} if the collaborator is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the collaborator couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
-    public ResponseEntity<Collaborator> updateCollaborator(
+    public ResponseEntity<CollaboratorRecord> updateCollaborator(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Collaborator collaborator
+        @Valid @RequestBody CollaboratorRecord collaboratorRecord
     ) throws URISyntaxException {
-        log.debug("REST request to update Collaborator : {}, {}", id, collaborator);
-        if (collaborator.getId() == null) {
+        log.debug("REST request to update Collaborator : {}, {}", id, collaboratorRecord);
+        if (collaboratorRecord.id() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, collaborator.getId())) {
+        if (!Objects.equals(id, collaboratorRecord.id())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -103,99 +94,38 @@ public class CollaboratorResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Collaborator result = collaboratorService.update(collaborator);
+        Collaborator result = collaboratorService.save(collaboratorRecord);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, collaborator.getId().toString()))
-            .body(result);
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, collaboratorRecord.id().toString()))
+            .body(CollaboratorRecord.of(result));
     }
 
-    /**
-     * {@code PATCH  /collaborators/:id} : Partial updates given fields of an existing collaborator, field will ignore if it is null
-     *
-     * @param id the id of the collaborator to save.
-     * @param collaborator the collaborator to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated collaborator,
-     * or with status {@code 400 (Bad Request)} if the collaborator is not valid,
-     * or with status {@code 404 (Not Found)} if the collaborator is not found,
-     * or with status {@code 500 (Internal Server Error)} if the collaborator couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<Collaborator> partialUpdateCollaborator(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Collaborator collaborator
-    ) throws URISyntaxException {
-        log.debug("REST request to partial update Collaborator partially : {}, {}", id, collaborator);
-        if (collaborator.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, collaborator.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!collaboratorRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<Collaborator> result = collaboratorService.partialUpdate(collaborator);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, collaborator.getId().toString())
-        );
-    }
-
-    /**
-     * {@code GET  /collaborators} : get all the collaborators.
-     *
-     * @param pageable the pagination information.
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of collaborators in body.
-     */
     @GetMapping("")
-    public ResponseEntity<List<Collaborator>> getAllCollaborators(
+    public ResponseEntity<List<CollaboratorRecord>> getAllCollaborators(
         CollaboratorCriteria criteria,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         log.debug("REST request to get Collaborators by criteria: {}", criteria);
 
-        Page<Collaborator> page = collaboratorQueryService.findByCriteria(criteria, pageable);
+        Page<CollaboratorRecord> page = collaboratorQueryService.findByCriteria(criteria, pageable).map(CollaboratorRecord::of);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    /**
-     * {@code GET  /collaborators/count} : count all the collaborators.
-     *
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-     */
     @GetMapping("/count")
     public ResponseEntity<Long> countCollaborators(CollaboratorCriteria criteria) {
         log.debug("REST request to count Collaborators by criteria: {}", criteria);
         return ResponseEntity.ok().body(collaboratorQueryService.countByCriteria(criteria));
     }
 
-    /**
-     * {@code GET  /collaborators/:id} : get the "id" collaborator.
-     *
-     * @param id the id of the collaborator to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the collaborator, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
-    public ResponseEntity<Collaborator> getCollaborator(@PathVariable("id") Long id) {
+    public ResponseEntity<CollaboratorRecord> getCollaborator(@PathVariable("id") Long id) {
         log.debug("REST request to get Collaborator : {}", id);
         Optional<Collaborator> collaborator = collaboratorService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(collaborator);
+        return ResponseUtil.wrapOrNotFound(collaborator.map(CollaboratorRecord::of));
     }
 
-    /**
-     * {@code DELETE  /collaborators/:id} : delete the "id" collaborator.
-     *
-     * @param id the id of the collaborator to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCollaborator(@PathVariable("id") Long id) {
         log.debug("REST request to delete Collaborator : {}", id);
