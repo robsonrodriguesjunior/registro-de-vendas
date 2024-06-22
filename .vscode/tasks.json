@@ -5,7 +5,7 @@
       "label": "build",
       "type": "shell",
       "command": "./gradlew",
-      "args": ["clean", "compileJava", "-x", "webapp"],
+      "args": ["clean", "compileJava", "-x", "webapp", "-x", "webapp_test"],
       "group": {
         "kind": "build",
         "isDefault": true
