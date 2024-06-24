@@ -6,17 +6,16 @@
       "home": "Home",
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
-        "main": "Entities",
+        "main": "Cadastros",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "person": "Person",
-        "client": "Client",
-        "collaborator": "Collaborator",
-        "category": "Category",
-        "product": "Product",
-        "sale": "Sale",
-        "sellersWhoEarnedMostView": "Sellers Who Earned Most View",
-        "sellersWhoSoldMostProductsView": "Sellers Who Sold Most Products View",
-        "topSellingProductsView": "Top Selling Products View"
+        "client": "Clientes",
+        "collaborator": "Colaboradores",
+        "category": "Categorias",
+        "product": "Produtos",
+        "sale": "Vendas",
+        "sellersWhoEarnedMostView": "Vendedores que mais faturaram",
+        "sellersWhoSoldMostProductsView": "Vendedores que mais venderam itens",
+        "topSellingProductsView": "Produtos mais vendidos"
       },
       "account": {
         "main": "Account",

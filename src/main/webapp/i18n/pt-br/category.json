@@ -3,7 +3,6 @@
     "category": {
       "home": {
         "title": "Categorias",
-        "refreshListLabel": "Atualizar lista",
         "createLabel": "Criar nova Categoria",
         "createOrEditLabel": "Criar ou editar Categoria",
         "notFound": "Nenhuma Categoria encontrada"
