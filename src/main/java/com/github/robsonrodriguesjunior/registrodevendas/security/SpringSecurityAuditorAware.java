@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringSecurityAuditorAware implements AuditorAware<String> {
 
+    // The return type is incompatible with '@NonNull Optional<String>' returned from AuditorAware<String>.getCurrentAuditor() (mismatching null constraints) Java(67109778)
+    @SuppressWarnings("null") // Java language server Bug - For: "Java(67109778)"
     @Override
     public Optional<String> getCurrentAuditor() {
         return Optional.of(SecurityUtils.getCurrentUserLogin().orElse(Constants.SYSTEM));
