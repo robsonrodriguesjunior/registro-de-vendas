@@ -1,0 +1,12 @@
+$footer-height: 40px;
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - $footer-height);
+}
+
+.footer {
+  flex: 0 0 auto;
+  height: $footer-height;
+}

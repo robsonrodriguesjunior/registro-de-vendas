@@ -1,10 +1,10 @@
-import { Component, OnInit, RendererFactory2, Renderer2 } from '@angular/core';
-import { RouterOutlet, Router } from '@angular/router';
-import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
+import { Component, OnInit, Renderer2, RendererFactory2 } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import dayjs from 'dayjs/esm';
 
-import { AccountService } from 'app/core/auth/account.service';
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
+import { AccountService } from 'app/core/auth/account.service';
 import FooterComponent from '../footer/footer.component';
 import PageRibbonComponent from '../profiles/page-ribbon.component';
 
@@ -12,6 +12,7 @@ import PageRibbonComponent from '../profiles/page-ribbon.component';
   selector: 'jhi-main',
   standalone: true,
   templateUrl: './main.component.html',
+  styleUrl: './main.component.scss',
   providers: [AppPageTitleStrategy],
   imports: [RouterOutlet, FooterComponent, PageRibbonComponent],
 })

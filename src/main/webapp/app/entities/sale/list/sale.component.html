@@ -3,11 +3,6 @@
     <span jhiTranslate="registroDeVendasApp.sale.home.title">Sales</span>
 
     <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
-        <span jhiTranslate="registroDeVendasApp.sale.home.refreshListLabel">Atualizar lista</span>
-      </button>
-
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
