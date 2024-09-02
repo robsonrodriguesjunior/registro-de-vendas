@@ -51,7 +51,7 @@
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                  <fa-icon [icon]="['fas', 'users']" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.entities.client">Client</span>
                 </a>
               </li>
@@ -63,7 +63,7 @@
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                  <fa-icon [icon]="['fas', 'building-user']" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.entities.collaborator">Collaborator</span>
                 </a>
               </li>
@@ -75,8 +75,8 @@
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.category">Category</span>
+                  <fa-icon [icon]="['fas', 'tag']" [fixedWidth]="true"></fa-icon>
+                  <span jhiTranslate="global.menu.entities.category"></span>
                 </a>
               </li>
               <li>
@@ -87,7 +87,7 @@
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                  <fa-icon [icon]="['fas', 'bag-shopping']" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.entities.product">Product</span>
                 </a>
               </li>
@@ -99,7 +99,7 @@
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                  <fa-icon [icon]="['fas', 'cash-register']" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.entities.sale">Sale</span>
                 </a>
               </li>
