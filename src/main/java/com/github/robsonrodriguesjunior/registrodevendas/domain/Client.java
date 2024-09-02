@@ -52,7 +52,7 @@ public class Client implements Serializable {
     private String code;
 
     @JsonIgnoreProperties(value = { "client" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private Person person;
 

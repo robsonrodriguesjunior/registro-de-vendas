@@ -56,7 +56,7 @@ public class Collaborator implements Serializable {
     private CollaboratorStatus status;
 
     @JsonIgnoreProperties(value = { "seller" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(unique = true)
     private Person person;
 
